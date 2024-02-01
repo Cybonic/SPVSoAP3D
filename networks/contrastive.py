@@ -11,8 +11,6 @@ class SparseModelWrapper(nn.Module):
                         loss        = None,
                         minibatch_size = 3, 
                         device = 'cuda',
-                        class_loss_on = False,
-                        class_loss_margin = 0.1,
                         **args,
                         ):
                         
@@ -24,17 +22,100 @@ class SparseModelWrapper(nn.Module):
         self.device = device
         self.batch_counter = 0 
         self.model = model
-        self.class_loss_on = class_loss_on
+        self.device = 'cpu'
+    
+        try:
+            self.device =  next(self.parameters()).device
+        except:
+            print('ModelWrapper device: ',self.device)
+        
+
+    def mean_grad(self):
+        if self.batch_counter == 0:
+            self.batch_counter  = 1 
+
+        for name, param in self.model.named_parameters():
+            if param.requires_grad:
+                param.grad /= self.batch_counter
+
+        self.batch_counter = 0 
+
+
+    def forward(self,pcl,**arg):
+        self.device =  next(self.parameters()).device
+        self.model.to(self.device)
+        # Mini Batch training due to memory constrains
+        
+        if self.training == False:
+            pred = self.model(pcl.to(self.device))
+            pred = pred['out']
+            return(pred)
+
+        # Training
+        # Adaptation to new paradigm
+        batch_loss = 0
+        sparse_data = pcl[0].to(self.device)  # pcl[0] is the sparse tensor
+        sparse_index = np.array(pcl[1]) # pcl[1] is the sparse index
+        labels = pcl[2]       # pcl[2] is the labels
+
+        anchor_idx = np.array([idx for idx,label in enumerate(labels) if label == 'anchor'])
+        positive_idx = np.array([idx for idx,label in enumerate(labels) if label == 'positive'])
+        negative_idx = np.array([idx for idx,label in enumerate(labels) if label == 'negative'])
+        
+        pred = self.model(sparse_data.to(self.device))
+        
+        feat = pred['feat']
+        pred = pred['out']
+            
+        descriptor = {'a':pred[anchor_idx],'p':pred[positive_idx],'n':pred[negative_idx]}
+        poses = {'a':sparse_index[anchor_idx],'p':sparse_index[positive_idx],'n':sparse_index[negative_idx]}
+        
+        # Triplet Loss calculation
+        loss_value, info = self.loss(descriptor = descriptor, poses = poses)
+        loss_value.backward() # Back propagate gradients and free graph
+        batch_loss += loss_value
+
+        return(batch_loss,info)
+
+    def __str__(self):
+        out = [str(self.model),
+               str(self.loss)
+               ]
+        out = '-'.join(out)
+        return out
+    
+    
+    
+    
+class SparseModelWrapperLoss(nn.Module):
+    def __init__(self,  model,
+                        loss        = None,
+                        minibatch_size = 3, 
+                        device = 'cuda',
+                        class_loss_on = False,
+                        class_loss_margin = 0.1,
+                        **args,
+                        ):
+                        
+        super(SparseModelWrapperLoss,self).__init__()
+        assert minibatch_size>= 3, 'Minibatch size too small'
+        
+        self.loss = loss
+        self.minibatch_size = minibatch_size
+        self.device = device
+        self.batch_counter = 0 
+        self.model = model
+        self.pooling = args['pooling']
+        self.class_loss_on     = class_loss_on
         self.class_loss_margin = class_loss_margin
         self.device = 'cpu'
         
         self.sec_loss = pcl_binary_loss(**args)
+        
         if class_loss_on:
             self.representation = args['representation']
         else:
             self.representation = ''
-            
-        #    self.sec_loss = pcl_binary_loss(**args)
  
         try:
             self.device =  next(self.parameters()).device
@@ -83,12 +164,14 @@ class SparseModelWrapper(nn.Module):
         # Triplet Loss calculation
         loss_value, info = self.loss(descriptor = descriptor, poses = poses)
         
-        
         if self.class_loss_on:
-        #    pass
             if self.representation == 'features':
-                feat = torch.max(feat, dim=1, keepdim=False)[0]
+                if self.pooling == 'max':
+                    feat = torch.max(feat, dim=1, keepdim=False)[0]
+                elif self.pooling == 'mean':
+                    feat = torch.mean(feat, dim=1, keepdim=False)[0]
                 da,dp,dn = feat[anchor_idx],feat[positive_idx],feat[negative_idx]
+            
             else:
                 da,dp,dn = pred[anchor_idx],pred[positive_idx],pred[negative_idx]
                 
@@ -101,13 +184,12 @@ class SparseModelWrapper(nn.Module):
         batch_loss += loss_value
 
         return(batch_loss,info)
-    
 
     def __str__(self):
         
         out = [str(self.model),
                str(self.loss),
-               f'{self.sec_loss}M{self.class_loss_margin}' if self.class_loss_on else 'noclassloss',
+               f'{self.sec_loss}M{self.class_loss_margin}' if self.class_loss_on else '',
                self.representation if self.class_loss_on else ''
                ]
         out = '-'.join(out)
@@ -140,25 +222,10 @@ class ModelWrapper(nn.Module):
         print('ModelWrapper device: ',self.device)
         
 
-    def mean_grad(self):
-        if self.batch_counter == 0:
-            self.batch_counter  = 1 
-
-        for name, param in self.model.named_parameters():
-            if param.requires_grad:
-                param.grad /= self.batch_counter
-        
-        self.batch_counter = 0 
-
-
     def forward(self,pcl,**argv):
         
-        
-        #pcl = pcl.type(torch.FloatTensor)
-        # self.model.cuda()
         # Mini Batch training due to memory constrains
         if self.training == False:
-            #pcl = pcl.type(torch.cuda.FloatTensor)
             pred = self.model(pcl) # pred = self.model(pcl.cuda())
             return(pred)
 
@@ -192,9 +259,7 @@ class ModelWrapper(nn.Module):
             if pclt.shape[0]==1: # drop last
                 continue
 
-            #pclt = pclt.type(torch.FloatTensor).to(self.device)
             pred = self.model(pclt) # pclt.cuda()
-            #pred,feat = self.model(pclt)
             
             a_idx = num_anchor
             p_idx = num_pos+num_anchor
@@ -212,23 +277,9 @@ class ModelWrapper(nn.Module):
 
         return(batch_loss,info)
     
-    def get_backbone_params(self):
-        return self.model.get_backbone_params()
-
-    def get_classifier_params(self):
-        return self.model.get_classifier_params()
-    
-    def resume(self,path):
-        assert os.path.isfile(path),'Something is work with the path: '+ path
-        checkpoint = torch.load(path)
-        self.model.load_state_dict(checkpoint['state_dict'])
-        print("Loader pretrained model: " + path)
 
     def __str__(self):
         return str(self.model) + '-' + str(self.loss)
-    
-    
-    
     
     
 
@@ -250,37 +301,20 @@ class ModelWrapperLoss(nn.Module):
         self.model = model
         self.device = 'cpu'
         self.margin = margin
+        self.representation = args['representation']
+        self.class_loss_on = args['class_loss_on']
+        self.pooling = args['pooling']
         
-        self.sec_loss = pcl_binary_loss()
-        try:
-            self.device =  next(self.parameters()).device
-        except:
-            print('ModelWrapper device: ',self.device)
-            
-        
+        self.sec_loss = pcl_binary_loss() 
         print('ModelWrapper device: ',self.device)
-        
-
-    def mean_grad(self):
-        if self.batch_counter == 0:
-            self.batch_counter  = 1 
-
-        for name, param in self.model.named_parameters():
-            if param.requires_grad:
-                param.grad /= self.batch_counter
-        
-        self.batch_counter = 0 
 
 
     def forward(self,pcl,**argv):
         
-        
         self.device =  next(self.parameters()).device
         if self.training == False:
-            #pcl = pcl.type(torch.cuda.FloatTensor)
             pred = self.model(pcl.to(self.device)) # pred = self.model(pcl.cuda())
-            if isinstance(pred,dict):
-                pred = pred['d']
+            pred = pred['out']
             return(pred)
 
         # Training
@@ -294,8 +328,6 @@ class ModelWrapperLoss(nn.Module):
         labels.append(row_labels[pose_anchor])
         labels.extend(row_labels[pose_positive])
         labels.extend(row_labels[pose_negative])
-        
-        
         
         if len(anchor.shape)<4:
             anchor = anchor.unsqueeze(0)
@@ -320,20 +352,13 @@ class ModelWrapperLoss(nn.Module):
             
             if pclt.shape[0]==1: # drop last
                 continue
-
-            #pclt = pclt.type(torch.FloatTensor).to(self.device)
             
             pred = self.model(pclt.to(self.device)) # pclt.cuda()
             
+            feat = pred['feat']
+            pred = pred['out'] 
+            
             global_loss = 0
-            
-            true_labels = torch.tensor(labels,dtype=torch.long).to(self.device)
-            #true_labels = torch.zeros(pred['c'].size()).to(self.device)
-            #true_labels[np.array(labels)] = 1.0
-            
-            class_loss = self.model.loss(pred['c'], true_labels)
-            pred = pred['d']  
-            #pred,feat = self.model(pclt)
             
             a_idx = num_anchor
             p_idx = num_pos+num_anchor
@@ -342,24 +367,43 @@ class ModelWrapperLoss(nn.Module):
             dq,dp,dn = pred[0:a_idx],pred[a_idx:p_idx],pred[p_idx:n_idx]
             descriptor = {'a':dq,'p':dp,'n':dn}
 
-            mloss = self.sec_loss(dq,dp,dn)
+            if self.class_loss_on:
+                if self.representation == 'features':
+                    if self.pooling == 'max':
+                        feat = torch.max(feat, dim=1, keepdim=False)[0]
+                    elif self.pooling == 'mean':
+                        feat = torch.mean(feat, dim=1, keepdim=False)[0]
+                        
+                    da,dp,dn = feat[0:a_idx],feat[a_idx:p_idx],feat[p_idx:n_idx]
+                else:
+                    da,dp,dn = pred[0:a_idx],pred[a_idx:p_idx],pred[p_idx:n_idx]
+                
+            class_loss_value = self.sec_loss(da,dp,dn)
             loss_value,info = self.loss(descriptor = descriptor, poses = pose)
-            
-            info['class_loss'] = mloss
-            global_loss = loss_value + self.margin*mloss
+            loss_value += self.margin*class_loss_value
+            info['class_loss'] = class_loss_value.detach()
+
             
             # devide by the number of batch iteration; as direct implication in the grads
-            global_loss /= mini_batch_total_iteration 
+            loss_value /= mini_batch_total_iteration 
             
-            global_loss.backward() # Backpropagate gradients and free graph
-            batch_loss += global_loss
+            loss_value.backward() # Backpropagate gradients and free graph
+            batch_loss += loss_value
 
         return(batch_loss,info)
     
-
     def __str__(self):
-        return str(self.model) + '-' + str(self.loss) +'-'+str(self.sec_loss) + '-margin-' + str(self.margin)
-    
+        
+        name = [str(self.model),
+                str(self.loss),
+               f'{self.sec_loss}M{self.margin}' if self.class_loss_on else 'noloss',
+               self.representation if self.class_loss_on else '',
+                self.pooling if self.class_loss_on else ''
+               ]
+        str_name = '-'.join(name)
+        return str_name
+
+
 
 
 def mlp_layers(nch_input, nch_layers, b_shared=True, bn_momentum=0.1, dropout=0.0):

@@ -94,18 +94,11 @@ class PointNetCGAP(torch.nn.Module):
         self.pooling = pooling
 
     def forward(self, points,):
+        
         feat = self.features(points)
-        if self.pooling == 'max':
-            feat_int = torch.max(feat, dim=-1, keepdim=False)[0]
-        elif self.pooling == 'mean':
-            feat_int = torch.mean(feat, dim=-1, keepdim=False)
-        else:
-            raise NotImplementedError
-        #feat = self.head(feat)
-        out = self.classifier(feat_int)
         d = self.head(feat)
         
-        return {'c':out,'d':d}
+        return {'out':d,'feat':feat}
 
     def __str__(self):
         return f"PointNetCGAP-{self.pooling}-nlog"
