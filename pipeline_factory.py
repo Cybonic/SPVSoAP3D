@@ -110,11 +110,13 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
     print(f'Loss: {loss}')
     print("*"*30)
 
+    descriptor = {
+            'in_dim':2*256,
+            'kernels':[512,256],
+            'representation':'descriptor'
+        }
+    
     if pipeline_name in ['PointNetCGAP']:
-        model = contrastive.ModelWrapperLoss(pipeline,loss =loss,device = device, margin = 0.1,**argv['modelwrapper'])
-    elif pipeline_name in ['LOGG3D'] or pipeline_name.startswith("spvcnn"):
-        model = contrastive.SparseModelWrapper(pipeline,loss = loss,device = device,**argv['modelwrapper'])
-    elif pipeline_name in ['SPCov3D']:
         
         features = {
             'in_dim':2*16,
@@ -122,20 +124,33 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
             'representation':'features'
         }
         
-        descriptor = {
-            'in_dim':2*256,
-            'kernels':[512,256],
-            'representation':'descriptor'
-        }
+        model = contrastive.ModelWrapperLoss(pipeline,
+                                             loss =loss,
+                                             device = device, 
+                                             margin = 0.1,
+                                             class_loss_on = True,
+                                             representation = 'descriptor',
+                                             pooling = 'max',
+                                             **argv['modelwrapper'])
+
+    elif pipeline_name in ['SPCov3D']:
         
-        model = contrastive.SparseModelWrapper(pipeline, 
+        features = {
+            'in_dim':2*16,
+            'kernels':[32,16],
+            'representation':'features'
+        }
+        model = contrastive.SparseModelWrapperLoss(pipeline, 
                                                loss = loss,
                                                device = device,
-                                               class_loss_on=True,
-                                               class_loss_margin=0.5, 
-                                               **features,
+                                               class_loss_on = True,
+                                               class_loss_margin = 0.5, 
+                                               pooling = 'max',
+                                               **descriptor,
                                                **argv['modelwrapper'])
     
+    elif pipeline_name in ['LOGG3D']:
+        model = contrastive.SparseModelWrapper(pipeline,loss = loss,device = device,**argv['modelwrapper'])
     else:
         model = contrastive.ModelWrapper(pipeline,loss =loss,device = device, **argv['modelwrapper'])
 
