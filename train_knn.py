@@ -22,8 +22,6 @@ import torch
 
 #from networks.orchnet import *
 from trainer import Trainer
-
-
 from pipeline_factory import model_handler,dataloader_handler
 import numpy as np
 
@@ -44,7 +42,7 @@ if __name__ == '__main__':
         '--network', '-m',
         type=str,
         required=False,
-        default='SPCov3D',#'LOGG3D', #SPCov3D
+        default='PointNetCGAP',#'LOGG3D', #SPCov3D
         help='Directory to get the trained model.'
     )
 
@@ -307,7 +305,6 @@ if __name__ == '__main__':
 
     device_name = os.uname()[1]
     pc_config = yaml.safe_load(open("sessions/pc_config.yaml", 'r'))
-
     root_dir = pc_config[device_name]
     
     # Build the model and the loader

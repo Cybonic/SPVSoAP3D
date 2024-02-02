@@ -10,11 +10,11 @@ root_dir = pc_config[device_name]
 
 dataset = "uk"
 
-session_cfg_file = os.path.join('sessions',dataset + '.yaml')
+session_cfg_file = os.path.join('sessions', 'ukfrpt.yaml')
 print("Opening session config file: %s" % session_cfg_file)
 SESSION = yaml.safe_load(open(session_cfg_file, 'r'))
 
-seq_names_dict = SESSION['train_sequence']
+seq_names_dict = SESSION['cross_validation']
 
 for test,train in seq_names_dict.items():
     print("\n")

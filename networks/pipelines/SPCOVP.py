@@ -14,10 +14,12 @@ __all__ = ['LOGG3D']
 
 
 class SPCov3D(nn.Module):
-    def __init__(self, output_dim=256,n_seg_class=2,local_feat_dim=16,do_fc=False,do_pe = False):
+    def __init__(self, output_dim=256,n_seg_class=2,local_feat_dim=16,do_fc=False,do_pe = False,**kwargs):
         super(SPCov3D, self).__init__()
-
-        self.backbone = spvcnn(output_dim=local_feat_dim,pres=1,vres=1,cr=0.64)
+        pres = kwargs['pres']
+        vres = kwargs['vres']
+        
+        self.backbone = spvcnn(output_dim=local_feat_dim,pres=pres,vres=vres,cr=0.64)
         self.head = COV(do_fc=do_fc, do_pe = do_pe, input_dim=local_feat_dim, is_tuple=False,output_dim=output_dim)
         
         

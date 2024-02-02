@@ -1,7 +1,7 @@
 
 import os
 
-full_cap = '--epoch 15'
+full_cap = '--epoch 50'
 args = [
         '--network SPCov3D',
         #'--network PointNetVLAD',
@@ -29,21 +29,19 @@ losses = ['LazyTripletLoss']
 density = ['10000']
 
 evaluation_type = "cross_validation"
-experiment = f'-e iros24/{evaluation_type}-nonorm-10m-aug-noroi'
+experiment      = f'-e iros24/{evaluation_type}-nonorm-10m-aug-noroi_0.01voxel'
 input_preprocessing = ' --roi 0 --augmentation 1 --pcl_norm 0'
 
 resume  = '--resume best_model'
 
 test_sequrnces = [
-        '--val_set uk/orchards/aut22/extracted',
         '--val_set GEORGIA-FR/husky/orchards/10nov23/00/submaps',
-        '--val_set uk/strawberry/june23/extracted',
-        '--val_set greenhouse/e3/extracted', 
-        '--val_set uk/orchards/sum22/extracted',
-        '--val_set uk/orchards/june23/extracted',
- 
+        #'--val_set uk/orchards/aut22/extracted',
+        #'--val_set uk/strawberry/june23/extracted',
+        #'--val_set greenhouse/e3/extracted', 
+        #'--val_set uk/orchards/sum22/extracted',
+        #'--val_set uk/orchards/june23/extracted'
 ]
-
 
 for seq in test_sequrnces:
         for arg in args:
