@@ -44,7 +44,7 @@ if __name__ == '__main__':
         '--network', '-m',
         type=str,
         required=False,
-        default='SPCov3D',#'LOGG3D', #SPCov3D
+        default='SPGAP',#'LOGG3D', #SPCov3D
         help='Directory to get the trained model.'
     )
 
