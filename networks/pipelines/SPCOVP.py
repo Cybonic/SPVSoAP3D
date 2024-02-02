@@ -23,7 +23,6 @@ class SPGAP(nn.Module):
         
         #self.head = COV(do_fc=do_fc, do_pe = do_pe, input_dim=local_feat_dim, is_tuple=False,output_dim=output_dim)
         
-        
     def forward(self, x):
         
         _, counts = torch.unique(x.C[:, -1], return_counts=True)
@@ -55,7 +54,6 @@ class SPCov3D(nn.Module):
     def forward(self, x):
         
         _, counts = torch.unique(x.C[:, -1], return_counts=True)
-
         x = self.backbone(x)
         y = torch.split(x, list(counts))
         lfeat = torch.nn.utils.rnn.pad_sequence(list(y)).permute(1, 0, 2)
@@ -88,9 +86,9 @@ class fc_net(nn.Module):
 
 
 class PointNetCov3D(nn.Module):
-    def __init__(self, in_dim=3, feat_dim = 1024, num_points=2500, use_tnet=False, output_dim=1024):
+    def __init__(self, in_dim=3, feat_dim = 64, use_tnet=False, output_dim=256):
         super(PointNetCov3D, self).__init__()
-        self.backbone = self.point_net = PointNet_features(dim_k=feat_dim,use_tnet = use_tnet, scale=1)
+        self.backbone = self.point_net = PointNet_features(dim_k=feat_dim,use_tnet = use_tnet, scale=4)
         self.head = COV(do_fc=False, input_dim=feat_dim, is_tuple=False,output_dim=output_dim)
         
     def forward(self, x):
@@ -103,19 +101,17 @@ class PointNetCov3D(nn.Module):
     
     
 class PointNetCov3DC(nn.Module):
-    def __init__(self, in_dim=3, feat_dim = 1024, num_points=2500, use_tnet=False, output_dim=1024):
+    def __init__(self, in_dim=3, feat_dim = 64,  use_tnet=False, output_dim=1024):
         super(PointNetCov3DC, self).__init__()
 
         self.backbone = PointNet_features(dim_k=feat_dim,use_tnet = use_tnet, scale=1)
-        self.head = COV(do_fc=False, input_dim=feat_dim, is_tuple=False,output_dim=output_dim)
-        self.head_fc = fc_net(feat_dim,output_dim)
+        self.head = COV(do_fc=True, input_dim=feat_dim, is_tuple=False,output_dim=output_dim)
         
     def forward(self, x):
         
-        x = self.backbone(x)
+        x = self.backbone(x).permute(0, 2, 1)
         d = self.head(x)
-        x = self.head_fc(x)
-        return d,x
+        return {'out':d,'feat':x}
 
     def __str__(self):
         return "PointNetCov3DFC"
