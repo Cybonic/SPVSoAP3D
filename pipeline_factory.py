@@ -164,7 +164,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
 # ======================================== DATALOADER FACTORY ======================================
 # ==================================================================================================
 
-def dataloader_handler(root_dir,network,dataset,session,pcl_norm,**args):
+def dataloader_handler(root_dir,network,dataset,session,pcl_norm=False,**args):
 
     assert dataset in ['kitti','orchard-uk','uk','GreenHouse','greenhouse'],'Dataset Name does not exist!'
 

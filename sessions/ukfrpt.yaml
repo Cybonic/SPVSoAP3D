@@ -76,6 +76,7 @@ train_loader:
   shuffle: True
   num_pos: 1
   num_neg: 20
+  augmentation: False
 
   #rotation: [180,-45,-45]
   
@@ -85,6 +86,7 @@ val_loader:
   workers:  0            # number of threads to get data
   shuffle: False
   loop_range: 10 # Loop Threshold [m]
+  augmentation: False
 
 
 modelwrapper:

@@ -2,7 +2,7 @@
 
 # This file contains the different path to the dataset, depending on the PC the code is running
 
-tiago-deep: '/home/tiago/Dropbox/research/datasets'
+tiago-deep: '/home/tiago/workspace/DATASET'
 root: '/home/tiago/Dropbox/research-projects/orchards-uk/dataset'
 root_ws: 'C:\\Users\\Tiago\\TB\\datasets'
 deep-MS-7C37: "/home/deep/Dropbox/SHARE/DATASET"

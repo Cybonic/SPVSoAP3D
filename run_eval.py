@@ -1,9 +1,9 @@
 
 import os
 
-chkpt_root = '/home/deep/workspace/SPCoV/checkpoints'
+chkpt_root = '~/workspace/SPCoV/checkpoints'
 
-save_path = '/home/deep/workspace/SPCoV/predictions'
+save_path = '~/workspace/SPCoV/predictions'
 evaluation_type = "cross_validation"
 
 experiments = [f'iros24/{evaluation_type}-nonorm-10m-aug-noroi',
@@ -16,11 +16,11 @@ input_preprocessings = [' --roi 0 --augmentation 1 --pcl_norm 0',
 
 args = [
         f'--network PointNetVLAD',
-        f'--network SPCov3D',
+        #f'--network SPCov3D',
         f'--network PointNetMAC',
         f'--network PointNetSPoC',
         f'--network overlap_transformer --modality bev',
-        f'--network LOGG3D',
+        #f'--network LOGG3D',
 ]
 
 losses = ['LazyTripletLoss']
