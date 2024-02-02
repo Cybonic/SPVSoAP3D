@@ -38,7 +38,7 @@ class SPGAP(nn.Module):
 
     def __str__(self):
         
-        stack = ["SPCov3D" ,
+        stack = ["SPGAP" ,
                  str(self.head),
                  ]
         return '-'.join(stack)

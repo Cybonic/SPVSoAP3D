@@ -36,6 +36,9 @@ class SPoC(nn.Module):
         x = x.view(x.shape[0],x.shape[1],-1)
         x = self.fc(torch.mean(x, dim=-1, keepdim=False)) # Return (batch_size, descriptor_dim) tensor
         return _l2norm(x)
+    
+    def __str__(self):
+        return "SPoC"
 
 
 class GeM(nn.Module):
