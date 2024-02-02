@@ -72,7 +72,13 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
     elif pipeline_name == 'PoinNetCov3DC':
         pipeline = PointNetCov3DC(output_dim=output_dim, num_points = num_points, feat_dim = 1024)
     elif pipeline_name == 'SPCov3D':
-        pipeline = SPCov3D(output_dim=output_dim,local_feat_dim=16,do_fc=True,do_pe = True)
+        pipeline = SPCov3D(output_dim=output_dim,
+                           local_feat_dim=16,
+                           do_fc=True,
+                           do_pe = True,
+                           pres=0.01,
+                           vres=0.01)
+        
     elif pipeline_name == 'PointNetAP':
         pipeline = PointNetAP(output_dim=output_dim, num_points = num_points, feat_dim = 1024)
     elif pipeline_name == 'PointNetSOP':
@@ -199,7 +205,7 @@ def dataloader_handler(root_dir,network,dataset,session,pcl_norm=False,**args):
         
         # Get sparse (voxelized) point cloud based modality
         num_points=session['max_points']
-        modality = SparseLaserScan(voxel_size=0.05,max_points=num_points, pcl_norm = pcl_norm)
+        modality = SparseLaserScan(voxel_size=0.01,max_points=num_points, pcl_norm = pcl_norm)
     
     elif network in ['PointNetVLAD','PointNet_ORCHNet',"PointNetGeM","scancontext"] or network.startswith("PointNet"):
         

@@ -41,7 +41,7 @@ if __name__ == '__main__':
         '--network', '-m',
         type=str,
         required=False,
-        default='scancontext',
+        default='SPCov3D',
         help='Directory to get the trained model.'
     )
 
@@ -95,7 +95,7 @@ if __name__ == '__main__':
         '--mini_batch_size',
         type=int,
         required=False,
-        default=20000, #  Max size (based on the negatives)
+        default=22000, #  Max size (based on the negatives)
         help='Directory to get the trained model.'
     )
     parser.add_argument(
@@ -176,7 +176,7 @@ if __name__ == '__main__':
         '--chkpt_root',
         type=str,
         required=False,
-        default = "/home/deep/workspace/orchnet/v2/aa-0.5/checkpoints"
+        default = "~/workspace/SPCoV/checkpoints"
     )
     
     parser.add_argument(
