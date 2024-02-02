@@ -176,7 +176,9 @@ class SparseModelWrapperLoss(nn.Module):
                 da,dp,dn = pred[anchor_idx],pred[positive_idx],pred[negative_idx]
                 
             class_loss_value = self.sec_loss(da,dp,dn)
-            loss_value += self.class_loss_margin*class_loss_value
+            
+            loss_value =  self.class_loss_margin * loss_value + (1-self.class_loss_margin)*class_loss_value
+            
             info['class_loss'] = class_loss_value.detach()
         
 
