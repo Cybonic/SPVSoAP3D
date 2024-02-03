@@ -12,7 +12,7 @@ class COV(nn.Module):
         self.do_fc = do_fc
         self.do_pe = do_pe
         self.is_tuple = is_tuple
-        self.fc = nn.Linear(self.sop_dim, output_dim)
+        self.fc = nn.LazyLinear( output_dim)
 
     def _so_meanpool(self, x):
         batchSize, nFeat, dimFeat = x.data.shape
@@ -21,13 +21,9 @@ class COV(nn.Module):
         xmean = torch.mean(x, 1)
         x = x - xmean.unsqueeze(1)
         
-        # compute covariance
-        #x = torch.unsqueeze(x, -1)
-        
         cov = []
         for y in x:
             y = y.unsqueeze(0)
-     
             cov.append(torch.matmul(y.transpose(2, 1),y)/nFeat)
         x = torch.stack(cov).squeeze()
         #x = y.matmul(y.transpose(2, 1))
@@ -60,6 +56,7 @@ class COV(nn.Module):
         x = torch.stack(cov).squeeze()
         if self.do_fc:
             x = self.fc(x)
+            
         x = self._l2norm(x)
         return torch.squeeze(x)
     
