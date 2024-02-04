@@ -10,16 +10,16 @@ experiments = [f'iros24/{evaluation_type}-nonorm-10m-aug-noroi',
               #f'iros24/{evaluation_type}-nonorm-10m-aug'     
 ]
 
-input_preprocessings = [' --roi 0 --augmentation 1 --pcl_norm 0',
+input_preprocessings = [' --roi 0 --augmentation 0 --pcl_norm 0',
                        #' --roi 30 --augmentation 1 --pcl_norm 0'
 ]
 
 args = [
-        f'--network PointNetVLAD',
+        f'--network scancontext',
         #f'--network SPCov3D',
-        f'--network PointNetMAC',
-        f'--network PointNetSPoC',
-        f'--network overlap_transformer --modality bev',
+        #f'--network PointNetMAC',
+        #f'--network PointNetSPoC',
+        #f'--network overlap_transformer --modality bev',
         #f'--network LOGG3D',
 ]
 

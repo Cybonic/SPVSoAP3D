@@ -29,7 +29,7 @@ losses = ['LazyTripletLoss']
 density = ['10000']
 
 evaluation_type = "cross_validation"
-experiment      = f'-e iros24/{evaluation_type}-nonorm-10m-aug-noroi_0.01voxel'
+experiment      = f'-e iros24/{evaluation_type}-nonorm-10m-aug-noroi_0.1voxel'
 input_preprocessing = ' --roi 0 --augmentation 1 --pcl_norm 0'
 
 resume  = '--resume best_model'
