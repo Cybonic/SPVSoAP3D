@@ -3,7 +3,7 @@ import os
 
 full_cap = '--epoch 50'
 args = [
-        '--network PointNetCov3DC',
+        '--network SPCov3D',
         #'--network PointNetVLAD',
         #'--network LOGG3D',
         #'--network SPCov3D',
@@ -29,8 +29,8 @@ losses = ['LazyTripletLoss']
 density = ['10000']
 
 evaluation_type = "cross_validation"
-experiment      = f'-e iros24/{evaluation_type}-nonorm-10m-aug-noroi_0.1voxel'
-input_preprocessing = ' --roi 0 --augmentation 1 --pcl_norm 0'
+experiment      = f'-e iros24/{evaluation_type}-nonorm-10m-aug-noroi'
+input_preprocessing = ' --roi 0 --augmentation 1 --shuffle_points 1 --pcl_norm 0'
 
 resume  = '--resume best_model'
 
