@@ -8,7 +8,7 @@ from networks.aggregators.COV import *
 from networks.aggregators.pooling import SPoC
 from networks.backbones.spvnas.model_zoo import spvcnn,spvcnnx
 from networks.pipelines.pipeline_utils import *
-from networks.backbones.pointnet import PointNet_features
+from networks.backbones.pointnet import PointNet_features,PointNet_pca
 
 __all__ = ['LOGG3D']
 
@@ -104,6 +104,7 @@ class PointNetCov3DC(nn.Module):
     def __init__(self, in_dim=3, feat_dim = 64,  use_tnet=False, output_dim=1024):
         super(PointNetCov3DC, self).__init__()
 
+        self.feaet_dim = feat_dim
         self.backbone = PointNet_features(dim_k=feat_dim,use_tnet = use_tnet, scale=1)
         self.head = COV(do_fc=True, input_dim=feat_dim, is_tuple=False,output_dim=output_dim)
         
@@ -114,6 +115,29 @@ class PointNetCov3DC(nn.Module):
         return {'out':d,'feat':x}
 
     def __str__(self):
-        return "PointNetCov3DFC"
+        return f"PointNetCov3DC-{str(self.feaet_dim)}"
     
+    
+class PointNetPCACov3DC(nn.Module):
+    def __init__(self, in_dim=3, feat_dim = 64,  use_tnet=False, output_dim=1024):
+        super(PointNetPCACov3DC, self).__init__()
 
+        self.backbone = PointNet_pca(dim_k=feat_dim,use_tnet = use_tnet, scale=1)
+        self.head = COV(do_fc=True, input_dim=feat_dim, is_tuple=False,output_dim=output_dim)
+        self.output_dim = output_dim
+        
+    def forward(self, x):
+        
+        x = self.backbone(x)#.permute(0, 2, 1)
+        
+        #x = x.transpose(2, 1)
+        U, S, V = torch.pca_lowrank(x, q=self.output_dim, center=True, niter=2)
+        #xt = torch.matmul(xt, V[:,:,:3])
+        #x3t = xt.transpose(2, 1)
+        
+        
+        #d = self.head(x)
+        return {'out':S,'feat':x}
+
+    def __str__(self):
+        return "PointNetPCACov3DC"
