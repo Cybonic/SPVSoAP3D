@@ -7,6 +7,14 @@ import torchvision.transforms as Tr
 import torch
 PREPROCESSING = Tr.Compose([Tr.ToTensor()])
 
+def shuffle_points(points):
+  """
+  Shuffle the points
+  """
+  indices = np.arange(len(points))
+  np.random.shuffle(indices)
+  return points[indices]
+
 def random_subsampling(points,max_points):
   '''
   https://towardsdatascience.com/how-to-automate-lidar-point-cloud-processing-with-python-a027454a536c
@@ -280,6 +288,7 @@ class LaserScan:
 class Scan(LaserScan):
   def __init__(self,parser = None, max_points = -1,**argv):
     super(Scan,self).__init__(parser,max_points,**argv)
+    self.shuffle_points = True if 'shuffle_points' in argv and argv['shuffle_points'] == True else False
     pass
 
   def load(self,file):
@@ -296,10 +305,12 @@ class Scan(LaserScan):
     points, intensity = self.load(file)
     return points
   
-  def __call__(self,files,set_augmentation=False):
+  def __call__(self,files,set_augmentation=False,set_shuffle_points=False):
     points,intensity = self.load(files)
     if set_augmentation:
-        points = self.set_augmentation(points)
+      points = self.set_augmentation(points)
+    if set_shuffle_points:
+      points = shuffle_points(points)
             
     return self.to_tensor(points)
   

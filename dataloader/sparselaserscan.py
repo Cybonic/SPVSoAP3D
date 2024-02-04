@@ -43,7 +43,7 @@ class SparseLaserScan(LaserScan):
     def to_sparse_tensor(self,points):
         return numpy_to_sparse(points,self.voxel_size)
     
-    def __call__(self,files,set_augmentation=False):
+    def __call__(self,files,set_augmentation=False,**kwargs):
         buff = []
         if not isinstance(files,list) and not isinstance(files,np.ndarray):
             files = [files]
@@ -51,8 +51,10 @@ class SparseLaserScan(LaserScan):
         for file in files: 
             points,intensity = self.load(file)
             
+            
             if set_augmentation:
                 points = self.set_augmentation(points)
+                
                 
             pcl = np.concatenate((points,intensity.reshape(-1,1)),axis=-1)
             buff.append(pcl)
