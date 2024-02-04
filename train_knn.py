@@ -67,7 +67,7 @@ if __name__ == '__main__':
         '--memory',
         type=str,
         required=False,
-        default='DISK',
+        default='RAM',
         choices=['DISK','RAM'],
         help='Directory to get the trained model.'
     )
@@ -133,7 +133,7 @@ if __name__ == '__main__':
         '--modality',
         type=str,
         required=False,
-        default = "bev",
+        default = "pcd",
         help='sampling points.'
     )
 
@@ -172,14 +172,14 @@ if __name__ == '__main__':
         '--val_set',
         type=str,
         required=False,
-        default = 'greenhouse/e3/extracted',
+        default = 'GEORGIA-FR/husky/orchards/10nov23/00/submaps',
     )
 
     parser.add_argument(
         '--roi',
         type=float,
         required=False,
-        default = 30,
+        default = 0,
     )
     parser.add_argument(
         '--model_evaluation',
@@ -202,6 +202,12 @@ if __name__ == '__main__':
         default = 1,
     )
     
+    parser.add_argument(
+        '--shuffle_points',
+        type=float,
+        required=False,
+        default = 1,
+    )
     parser.add_argument(
         '--pcl_norm',
         type=float,
@@ -243,6 +249,7 @@ if __name__ == '__main__':
     SESSION['val_loader']['batch_size'] = FLAGS.batch_size
     SESSION['train_loader']['triplet_file'] = FLAGS.triplet_file
     SESSION['train_loader']['augmentation'] = FLAGS.augmentation
+    SESSION['train_loader']['shuffle_points'] = FLAGS.shuffle_points
     SESSION['val_loader']['ground_truth_file'] = FLAGS.eval_file
     SESSION['val_loader']['augmentation'] = False
     

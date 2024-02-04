@@ -98,10 +98,26 @@ class PointNetCov3D(nn.Module):
     def __str__(self):
         return "PointNetCov3D"
     
-    
+class PointNetCovTroch3DC(nn.Module):
+    def __init__(self, in_dim=3, feat_dim = 64,  use_tnet=False, output_dim=256):
+        super(PointNetCov3DC, self).__init__()
+
+        self.feat_dim = feat_dim
+        self.backbone = PointNet_features(dim_k=feat_dim,use_tnet = use_tnet, scale=1)
+        self.head = COV(do_fc=True, input_dim=feat_dim, is_tuple=False,output_dim=output_dim)
+        
+    def forward(self, x):
+        
+        x = self.backbone(x).permute(0, 2, 1)
+        d = self.head(x)
+        return {'out':d,'feat':x}
+
+    def __str__(self):
+        return f"PointNetCovTroch3DC-{str(self.feat_dim)}"
+       
     
 class PointNetCov3DC(nn.Module):
-    def __init__(self, in_dim=3, feat_dim = 64,  use_tnet=False, output_dim=1024):
+    def __init__(self, in_dim=3, feat_dim = 64,  use_tnet=False, output_dim=256):
         super(PointNetCov3DC, self).__init__()
 
         self.feaet_dim = feat_dim
@@ -140,4 +156,4 @@ class PointNetPCACov3DC(nn.Module):
         return {'out':S,'feat':x}
 
     def __str__(self):
-        return "PointNetPCACov3DC"
+        return "PointNetPCA3DC"

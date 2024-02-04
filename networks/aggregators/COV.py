@@ -4,6 +4,37 @@ import torch.nn.functional as F
 import numpy as np
 
 
+class COVtorch(nn.Module):
+    def __init__(self,   do_fc=True, output_dim=256,**kwargs):
+        super(COV, self).__init__()
+        self.do_fc = do_fc
+        self.fc = nn.LazyLinear( output_dim)
+
+    def _l2norm(self, x):
+        x = nn.functional.normalize(x, p=2, dim=-1)
+        return x
+
+    def forward(self, x):
+        cov = []
+        for y in x:
+            c = torch.cov(y.T)
+            cov.append(c.flatten())
+        x = torch.stack(cov).squeeze()
+        
+        if self.do_fc:
+            x = self.fc(x)
+            
+        x = self._l2norm(x)
+        return torch.squeeze(x)
+    
+    def __str__(self):
+        
+        stack = ["COVtroch",
+                "fc" if self.do_fc else "no_fc",
+                ]
+        return '-'.join(stack)
+    
+
 class COV(nn.Module):
     def __init__(self, thresh=1e-8, do_pe=True,  do_fc=True, input_dim=16, is_tuple=False,output_dim=256):
         super(COV, self).__init__()
@@ -20,17 +51,11 @@ class COV(nn.Module):
         # de-mean
         xmean = torch.mean(x, 1)
         x = x - xmean.unsqueeze(1)
-        
-        cov = []
-        for y in x:
-            y = y.unsqueeze(0)
-            cov.append(torch.matmul(y.transpose(2, 1),y)/nFeat)
-        x = torch.stack(cov).squeeze()
-        #x = y.matmul(y.transpose(2, 1))
+        x = x.matmul(x.transpose(2, 1))
 
-        #x = torch.reshape(x, (batchSize, nFeat, dimFeat, dimFeat))
-        #x = torch.mean(x, 1)
-        #x = torch.reshape(x, (-1, dimFeat, dimFeat))
+        x = torch.reshape(x, (batchSize, nFeat, dimFeat, dimFeat))
+        x = torch.mean(x, 1)
+        x = torch.reshape(x, (-1, dimFeat, dimFeat))
 
         # Normalize covariance
         if self.do_pe:
@@ -67,5 +92,4 @@ class COV(nn.Module):
                  "pe" if self.do_pe else "no_pe",
                  ]
         return '-'.join(stack)
-  
  

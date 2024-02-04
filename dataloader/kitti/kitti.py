@@ -25,6 +25,7 @@ class cross_validation():
         sequence  = self.train_cfg['sequence']
         triplet_files = self.train_cfg['triplet_file']
         augmentation = self.train_cfg['augmentation']
+        shuffle_points = self.train_cfg['shuffle_points']
    
         
         #max_points = self.max_points
@@ -41,7 +42,8 @@ class cross_validation():
                                     modality = self.modality,
                                     #ground_truth = self.train_cfg['ground_truth'],
                                     memory= self.memory,
-                                    augmentation = augmentation
+                                    augmentation = augmentation,
+                                    shuffle_points = shuffle_points
                                     
                                                 )
         
