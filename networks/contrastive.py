@@ -226,9 +226,11 @@ class ModelWrapper(nn.Module):
 
     def forward(self,pcl,**argv):
         
+        self.device =  next(self.parameters()).device
+        self.model.to(self.device)
         # Mini Batch training due to memory constrains
         if self.training == False:
-            pred = self.model(pcl) # pred = self.model(pcl.cuda())
+            pred = self.model(pcl.to(self.device)) # pred = self.model(pcl.cuda())
             return(pred)
 
         # Training
@@ -261,7 +263,7 @@ class ModelWrapper(nn.Module):
             if pclt.shape[0]==1: # drop last
                 continue
 
-            pred = self.model(pclt) # pclt.cuda()
+            pred = self.model(pclt.to(self.device)) # pclt.cuda()
             
             a_idx = num_anchor
             p_idx = num_pos+num_anchor

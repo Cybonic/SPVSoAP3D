@@ -80,8 +80,8 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
                            local_feat_dim=16,
                            do_fc = True,
                            do_pe = True,
-                           pres=0.05,
-                           vres=0.05)
+                           pres=0.1,
+                           vres=0.1)
         
     elif pipeline_name == 'PointNetAP':
         pipeline = PointNetAP(output_dim=output_dim, num_points = num_points, feat_dim = 1024)
@@ -207,7 +207,7 @@ def dataloader_handler(root_dir,network,dataset,session,pcl_norm=False,**args):
         
         # Get sparse (voxelized) point cloud based modality
         num_points=session['max_points']
-        modality = SparseLaserScan(voxel_size=0.01,max_points=num_points, pcl_norm = pcl_norm)
+        modality = SparseLaserScan(voxel_size=0.1,max_points=num_points, pcl_norm = pcl_norm)
     
     elif network in ['PointNetVLAD','PointNet_ORCHNet',"PointNetGeM","scancontext"] or network.startswith("PointNet"):
         
