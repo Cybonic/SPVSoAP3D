@@ -8,12 +8,14 @@ from ..backbones.pointnet import *
 from ..backbones import resnet
 from networks.utils import *
 
+
+
+
 class PointNetSPoC(nn.Module):
     def __init__(self,in_dim=3, feat_dim = 1024, num_points=2500, use_tnet=False, output_dim=1024):
         super(PointNetSPoC, self).__init__()
 
         self.point_net = PointNet_features(dim_k=feat_dim,use_tnet = use_tnet, scale=1)
-        
         self.head = SPoC(outdim=output_dim)
 
     def forward(self, x):
@@ -24,23 +26,29 @@ class PointNetSPoC(nn.Module):
     def __str__(self):
         return "PointNetSPoC"
 
+
+
+
+
+
 class PointNetAP(nn.Module):
     def __init__(self,in_dim=3, feat_dim = 1024, num_points=2500, use_tnet=False, output_dim=1024):
         super(PointNetAP, self).__init__()
 
         self.point_net = PointNet_features(dim_k=feat_dim,use_tnet = use_tnet, scale=1)
-        
         self.head = SPoC(outdim=output_dim)
 
     def forward(self, x):
         x = self.point_net(x) # B X Features X Points
-        #x = x.permute(0,2,1)
+        x = x.permute(0,2,1)
         x = self.head(x)
         return x
   
     def __str__(self):
         return "PointNetSPoC"
     
+
+
 
 class ResNet50SPoC(nn.Module):
     def __init__(self,in_dim=3, feat_dim = 1024, num_points=2500, output_dim=1024):
@@ -66,12 +74,6 @@ class ResNet50SPoC(nn.Module):
         x = x['out']
         x = self.head(x)
         return x
-    
-    def get_backbone_params(self):
-        return self.point_net.parameters()
-
-    def get_classifier_params(self):
-        return self.net_vlad.parameters()
   
     def __str__(self):
         return "ResNet50SPoC"
@@ -89,15 +91,12 @@ class PointNetCGAP(torch.nn.Module):
         self.classifier = torch.nn.Sequential(*list_layers)
         self.fc = nn.LazyLinear(output_dim)
         
-        self.classloss = torch.nn.NLLLoss()
         self.head = SPoC(outdim=output_dim)
         self.pooling = pooling
 
     def forward(self, points,):
-        
         feat = self.features(points)
         d = self.head(feat)
-        
         return {'out':d,'feat':feat}
 
     def __str__(self):
@@ -114,5 +113,3 @@ class PointNetCGAP(torch.nn.Module):
         loss_c = self.classloss(
             torch.nn.functional.log_softmax(out, dim=1), target)
         return loss_c
-
-
