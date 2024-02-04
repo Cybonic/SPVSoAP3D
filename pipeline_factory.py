@@ -14,7 +14,7 @@ from networks.pipelines.overlap_transformer import featureExtracter
 from networks.pipelines.SPoCNet import PointNetSPoC,ResNet50SPoC,PointNetAP,PointNetCGAP
 from networks.pipelines.MACNet import PointNetMAC,ResNet50MAC 
 from networks.pipelines.PointNetSOP import PointNetSOP
-from networks.pipelines.SPCOVP import SPCov3D,PointNetCov3D, PointNetCov3DC,SPGAP
+from networks.pipelines.SPCOVP import SPCov3D,PointNetCov3D, PointNetCovTroch3DC,PointNetCov3DC,SPGAP,PointNetPCACov3DC
 from networks.scancontext.scancontext import SCANCONTEXT
 import yaml
 
@@ -68,9 +68,13 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
     elif pipeline_name == 'PointNetCGAP':
         pipeline = PointNetCGAP(num_c = 7,feat_dim = 1024,use_tnet=False,output_dim=output_dim,pooling='max')
     elif pipeline_name == 'PointNetCov3D':
-        pipeline = PointNetCov3D(output_dim=output_dim, feat_dim = 64)
+        pipeline = PointNetCov3D(output_dim=output_dim, feat_dim = 1024)
+    elif pipeline_name == 'PointNetCovTorch3D':
+        pipeline = PointNetCovTroch3DC(output_dim=output_dim, feat_dim = 1024)
     elif pipeline_name == 'PointNetCov3DC':
         pipeline = PointNetCov3DC(output_dim=output_dim, feat_dim = 512)
+    elif pipeline_name == 'PointNetPCACov3DC':
+        pipeline = PointNetPCACov3DC(output_dim=output_dim, feat_dim = 512)
     elif pipeline_name == 'SPCov3D':
         pipeline = SPCov3D(output_dim=output_dim,
                            local_feat_dim=16,
@@ -85,8 +89,6 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
         pipeline = PointNetSOP(output_dim=output_dim, num_points = num_points, feat_dim = 16)
     elif pipeline_name == 'PointNetVLAD':
         pipeline = PointNetVLAD(use_tnet=True, output_dim=output_dim, num_points = num_points, feat_dim = 1024)
-    elif "ORCHNet" in pipeline_name:
-        pipeline = ORCHNet.__dict__[pipeline_name](output_dim=output_dim, num_points=num_points,feat_dim = feat_dim)
     elif pipeline_name == "PointNetGeM":
         pipeline = PointNetGeM(output_dim=output_dim, num_points = num_points, feat_dim = 1024)
     elif pipeline_name == "ResNet50GeM": 
@@ -124,7 +126,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
             'representation':'descriptor'
         }
     
-    if pipeline_name in ['PointNetCGAP','PointNetCov3DC']:
+    if pipeline_name in ['PointNetCGAP','PointNetCov3DC','PointNetPCACov3DC']:
         
         features = {
             'in_dim':2*16,
@@ -135,7 +137,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
         model = contrastive.ModelWrapperLoss(pipeline,
                                              loss =loss,
                                              device = device, 
-                                             margin = 0.1,
+                                             margin = 0.5,
                                              class_loss_on = True,
                                              representation = 'descriptor',
                                              pooling = 'max',

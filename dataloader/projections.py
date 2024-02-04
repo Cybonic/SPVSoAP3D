@@ -73,7 +73,7 @@ class BEVProjection(LaserScan):
     return self.get_points()
      
   
-  def __call__(self,file,set_augmentation=False):
+  def __call__(self,file,set_augmentation=False,**argv):
     points,remissions  = self.load(file)
     
     if set_augmentation:
