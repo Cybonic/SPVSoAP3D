@@ -80,8 +80,8 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
                            local_feat_dim=16,
                            do_fc = True,
                            do_pe = True,
-                           pres=0.05,
-                           vres=0.05)
+                           pres=0.1,
+                           vres=0.1)
         
     elif pipeline_name == 'PointNetAP':
         pipeline = PointNetAP(output_dim=output_dim, num_points = num_points, feat_dim = 1024)
