@@ -42,7 +42,7 @@ if __name__ == '__main__':
         '--network', '-m',
         type=str,
         required=False,
-        default='PointNetCov3DC',#'LOGG3D', #SPCov3D
+        default='SPCov3D',#'LOGG3D', #SPCov3D
         help='Directory to get the trained model.'
     )
 
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         '--memory',
         type=str,
         required=False,
-        default='RAM',
+        default='DISK',
         choices=['DISK','RAM'],
         help='Directory to get the trained model.'
     )
