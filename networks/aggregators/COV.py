@@ -47,10 +47,12 @@ class COV(nn.Module):
 
     def _so_meanpool(self, x):
         batchSize, nFeat, dimFeat = x.data.shape
-        #x = torch.reshape(x, (-1, dimFeat))
+        x = torch.reshape(x, (-1, dimFeat))
         # de-mean
-        xmean = torch.mean(x, 1)
-        x = x - xmean.unsqueeze(1)
+        xmean = torch.mean(x, 0)
+        x = x - xmean.unsqueeze(0)
+        
+        x = x.unsqueeze(-1)
         x = x.matmul(x.transpose(2, 1))
 
         x = torch.reshape(x, (batchSize, nFeat, dimFeat, dimFeat))
