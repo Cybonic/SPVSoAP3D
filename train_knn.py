@@ -42,7 +42,7 @@ if __name__ == '__main__':
         '--network', '-m',
         type=str,
         required=False,
-        default='PointNetCGAP',#'LOGG3D', #SPCov3D
+        default='PointNetCov3DC',#'LOGG3D', #SPCov3D
         help='Directory to get the trained model.'
     )
 

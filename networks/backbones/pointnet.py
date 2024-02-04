@@ -122,22 +122,41 @@ class PointNet_features(torch.nn.Module):
         points = points.view(B,P,C)
         #points = points.view()
         x = points.transpose(1, 2) # [B, 3, N]
+        
+        xt = x.transpose(2, 1)
+        U, S, V = torch.pca_lowrank(xt, q=3, center=True, niter=2)
+        xt = torch.matmul(xt, V[:,:,:3])
+        x1t = xt.transpose(2, 1)
+        
         if self.tnet1:
             t1 = self.tnet1(x)
             x = t1.bmm(x)
 
         x2 = self.h1(x)
+        
+        xt = x2.transpose(2, 1)
+        U, S, V = torch.pca_lowrank(xt, q=3, center=True, niter=2)
+        xt = torch.matmul(xt, V[:,:,:3])
+        x2t = xt.transpose(2, 1)
+        
         if self.tnet2:
             t2 = self.tnet2(x2)
             self.t_out_t2 = t2
             x2 = t2.bmm(x2)
-        
-        self.t_out_h1 = x2 # local features
 
         x3 = self.h2(x2)
+        
+        xt = x3.transpose(2, 1)
+        U, S, V = torch.pca_lowrank(xt, q=3, center=True, niter=2)
+        xt = torch.matmul(xt, V[:,:,:3])
+        x3t = xt.transpose(2, 1)
+        
+        feat = torch.cat((x1t,x2t,x3t),dim=1)
+        
+        #torch.pca_lowrank(x3, q=None, center=True, niter=2)
         #x = {'out':x}
 
-        return x3
+        return feat
 
 
 

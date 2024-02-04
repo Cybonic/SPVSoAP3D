@@ -14,7 +14,7 @@ from networks.pipelines.overlap_transformer import featureExtracter
 from networks.pipelines.SPoCNet import PointNetSPoC,ResNet50SPoC,PointNetAP,PointNetCGAP
 from networks.pipelines.MACNet import PointNetMAC,ResNet50MAC 
 from networks.pipelines.PointNetSOP import PointNetSOP
-from networks.pipelines.SPCOVP import SPCov3D,PointNetCov3D, PointNetCov3DC
+from networks.pipelines.SPCOVP import SPCov3D,PointNetCov3D, PointNetCov3DC,SPGAP
 from networks.scancontext.scancontext import SCANCONTEXT
 import yaml
 
@@ -63,19 +63,21 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
 
     if pipeline_name == 'LOGG3D':
         pipeline = LOGG3D(output_dim=output_dim)
+    elif pipeline_name == 'SPGAP':
+        pipeline = SPGAP(output_dim=output_dim)
     elif pipeline_name == 'PointNetCGAP':
         pipeline = PointNetCGAP(num_c = 7,feat_dim = 1024,use_tnet=False,output_dim=output_dim,pooling='max')
     elif pipeline_name == 'PointNetCov3D':
-        pipeline = PointNetCov3D(output_dim=output_dim, num_points = num_points, feat_dim = 16)
-    elif pipeline_name == 'PoinNetCov3DC':
-        pipeline = PointNetCov3DC(output_dim=output_dim, num_points = num_points, feat_dim = 1024)
+        pipeline = PointNetCov3D(output_dim=output_dim, feat_dim = 64)
+    elif pipeline_name == 'PointNetCov3DC':
+        pipeline = PointNetCov3DC(output_dim=output_dim, feat_dim = 512)
     elif pipeline_name == 'SPCov3D':
         pipeline = SPCov3D(output_dim=output_dim,
                            local_feat_dim=16,
-                           do_fc=True,
+                           do_fc = True,
                            do_pe = True,
-                           pres=0.1,
-                           vres=0.1)
+                           pres=0.05,
+                           vres=0.05)
         
     elif pipeline_name == 'PointNetAP':
         pipeline = PointNetAP(output_dim=output_dim, num_points = num_points, feat_dim = 1024)
@@ -122,7 +124,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
             'representation':'descriptor'
         }
     
-    if pipeline_name in ['PointNetCGAP']:
+    if pipeline_name in ['PointNetCGAP','PointNetCov3DC']:
         
         features = {
             'in_dim':2*16,
@@ -139,7 +141,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
                                              pooling = 'max',
                                              **argv['modelwrapper'])
 
-    elif pipeline_name in ['SPCov3D']:
+    elif pipeline_name in ['SPCov3D','SPGAP']:
         
         features = {
             'in_dim':2*16,
@@ -199,7 +201,7 @@ def dataloader_handler(root_dir,network,dataset,session,pcl_norm=False,**args):
         elif session['modality'] == "spherical" or network != "overlap_transformer":
             modality = SphericalProjection(256,256,square_roi=roi)
             
-    elif network in ['LOGG3D','SPCov3D'] or network.startswith("spvcnn"):
+    elif network in ['LOGG3D','SPCov3D','SPGAP'] or network.startswith("spvcnn"):
         
         # Get sparse (voxelized) point cloud based modality
         num_points=session['max_points']
