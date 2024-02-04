@@ -73,12 +73,7 @@ class COV(nn.Module):
         return x
 
     def forward(self, x):
-        #x = self._so_meanpool(x)
-        cov = []
-        for y in x:
-            c = torch.cov(y.T)
-            cov.append(c.flatten())
-        x = torch.stack(cov).squeeze()
+        x = self._so_meanpool(x)
         if self.do_fc:
             x = self.fc(x)
             
