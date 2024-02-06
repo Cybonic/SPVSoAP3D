@@ -3,22 +3,22 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
-def _so_layer_cov(self, x):
+def _so_layer_cov( x,do_pe=True):
         batchSize, nFeat, dimFeat = x.data.shape
-        x = torch.reshape(x, (-1, dimFeat))
+        #x = torch.reshape(x, (-1, dimFeat))
         # de-mean
-        xmean = torch.mean(x, 0)
-        x = x - xmean.unsqueeze(0)
+        xmean = torch.mean(x, 1)
+        x = x - xmean.unsqueeze(1)
         
         x = x.unsqueeze(-1)
-        x = x.matmul(x.transpose(2, 1))
+        x = x.matmul(x.transpose(3, 2))
 
         x = torch.reshape(x, (batchSize, nFeat, dimFeat, dimFeat))
         x = torch.mean(x, 1)
         x = torch.reshape(x, (-1, dimFeat, dimFeat))
 
         # Normalize covariance
-        if self.do_pe:
+        if do_pe:
             x = x.double()
             # For pytorch versions < 1.9
             u_, s_, v_ = torch.svd(x)
@@ -105,7 +105,7 @@ class COV(nn.Module):
         else:
             x = self._so_meanpool(x)
         if self.do_fc:
-            x = self.fc(x)
+            x = x*F.softmax(self.fc(x),1)
         x = self._l2norm(x)
         return torch.squeeze(x)
     
