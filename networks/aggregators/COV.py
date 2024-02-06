@@ -78,7 +78,6 @@ class COV(nn.Module):
         x = self._so_meanpool(x)
         if self.do_fc:
             x = self.fc(x)
-            
         x = self._l2norm(x)
         return torch.squeeze(x)
     

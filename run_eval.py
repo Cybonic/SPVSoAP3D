@@ -15,7 +15,7 @@ input_preprocessings = [' --roi 0 --augmentation 0 --pcl_norm 0',
 ]
 
 args = [
-        f'--network scancontext',
+        f'--network SPCov3D',
         #f'--network SPCov3D',
         #f'--network PointNetMAC',
         #f'--network PointNetSPoC',
@@ -47,7 +47,7 @@ for input_preprocessing,experiment in zip(input_preprocessings,experiments):
                                 '--device cuda',
                                 '--eval_roi_window 100',
                                 '--resume best_model',
-                                f'--chkpt_root {chkpt_root}',
+                                #f'--chkpt_root {chkpt_root}',
                                 f'--save_predictions {os.path.join(save_path,experiment)}',
                                 f'-e {experiment}',
                                 input_preprocessing
