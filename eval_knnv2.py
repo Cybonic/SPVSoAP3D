@@ -176,7 +176,7 @@ if __name__ == '__main__':
         '--chkpt_root',
         type=str,
         required=False,
-        default = "~/workspace/SPCoV/checkpoints"
+        default = "None"
     )
     
     parser.add_argument(
@@ -211,7 +211,9 @@ if __name__ == '__main__':
     SESSION = yaml.safe_load(open(session_cfg_file, 'r'))
 
     SESSION['save_predictions'] = FLAGS.save_predictions
-    SESSION['trainer']['save_dir'] =  FLAGS.chkpt_root
+    
+    if FLAGS.chkpt_root != "None":
+        SESSION['trainer']['save_dir'] =  FLAGS.chkpt_root
     # Update config file with new settings
     SESSION['experiment'] = FLAGS.experiment
     SESSION['modelwrapper']['minibatch_size']  = FLAGS.mini_batch_size
