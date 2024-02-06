@@ -3,6 +3,30 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
+def _so_layer_cov(self, x):
+        batchSize, nFeat, dimFeat = x.data.shape
+        x = torch.reshape(x, (-1, dimFeat))
+        # de-mean
+        xmean = torch.mean(x, 0)
+        x = x - xmean.unsqueeze(0)
+        
+        x = x.unsqueeze(-1)
+        x = x.matmul(x.transpose(2, 1))
+
+        x = torch.reshape(x, (batchSize, nFeat, dimFeat, dimFeat))
+        x = torch.mean(x, 1)
+        x = torch.reshape(x, (-1, dimFeat, dimFeat))
+
+        # Normalize covariance
+        if self.do_pe:
+            x = x.double()
+            # For pytorch versions < 1.9
+            u_, s_, v_ = torch.svd(x)
+            s_alpha = torch.pow(s_, 0.5)
+            x = u_ @ torch.diag_embed(s_alpha) @ v_.transpose(-2, -1)
+
+        x = torch.reshape(x, (batchSize, -1))
+        return x.float()
 
 class COVtorch(nn.Module):
     def __init__(self,   do_fc=True, output_dim=256,**kwargs):
@@ -36,7 +60,7 @@ class COVtorch(nn.Module):
     
 
 class COV(nn.Module):
-    def __init__(self, thresh=1e-8, do_pe=True,  do_fc=True, input_dim=16, is_tuple=False,output_dim=256):
+    def __init__(self, thresh=1e-8, do_pe=True,  do_fc=True, input_dim=16, is_tuple=False,output_dim=256,pooling='bach_cov',**kwargs):
         super(COV, self).__init__()
         self.thresh = thresh
         self.sop_dim = input_dim * input_dim
@@ -44,6 +68,7 @@ class COV(nn.Module):
         self.do_pe = do_pe
         self.is_tuple = is_tuple
         self.fc = nn.LazyLinear( output_dim)
+        self.pooling = pooling
 
     def _so_meanpool(self, x):
         batchSize, nFeat, dimFeat = x.data.shape
@@ -75,7 +100,10 @@ class COV(nn.Module):
         return x
 
     def forward(self, x):
-        x = self._so_meanpool(x)
+        if self.pooling == 'layer_cov':
+            x = _so_layer_cov(x)
+        else:
+            x = self._so_meanpool(x)
         if self.do_fc:
             x = self.fc(x)
         x = self._l2norm(x)
@@ -84,6 +112,7 @@ class COV(nn.Module):
     def __str__(self):
         
         stack = ["COV" ,
+                 self.pooling,
                  "fc" if self.do_fc else "no_fc",
                  "pe" if self.do_pe else "no_pe",
                  ]

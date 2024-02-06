@@ -94,7 +94,7 @@ class TNet(torch.nn.Module):
         return x
 
 
-class PointNet_features(torch.nn.Module):
+class PointNet_pca(torch.nn.Module):
     def __init__(self,in_dim=3, dim_k=1024, use_tnet=False, sym_fn=symfn_max, scale=1):
         super().__init__()
         mlp_h1 = [int(64/scale), int(64/scale)]
@@ -123,10 +123,10 @@ class PointNet_features(torch.nn.Module):
         #points = points.view()
         x = points.transpose(1, 2) # [B, 3, N]
         
-        xt = x.transpose(2, 1)
-        U, S, V = torch.pca_lowrank(xt, q=3, center=True, niter=2)
-        xt = torch.matmul(xt, V[:,:,:3])
-        x1t = xt.transpose(2, 1)
+        #xt = x.transpose(2, 1)
+        #U, S, V = torch.pca_lowrank(xt, q=3, center=True, niter=2)
+        #xt = torch.matmul(xt, V[:,:,:3])
+        #x1t = xt.transpose(2, 1)
         
         if self.tnet1:
             t1 = self.tnet1(x)
@@ -134,10 +134,10 @@ class PointNet_features(torch.nn.Module):
 
         x2 = self.h1(x)
         
-        xt = x2.transpose(2, 1)
-        U, S, V = torch.pca_lowrank(xt, q=3, center=True, niter=2)
-        xt = torch.matmul(xt, V[:,:,:3])
-        x2t = xt.transpose(2, 1)
+        #xt = x2.transpose(2, 1)
+        #U, S, V = torch.pca_lowrank(xt, q=3, center=True, niter=2)
+        #xt = torch.matmul(xt, V[:,:,:3])
+        #x2t = xt.transpose(2, 1)
         
         if self.tnet2:
             t2 = self.tnet2(x2)
@@ -146,17 +146,63 @@ class PointNet_features(torch.nn.Module):
 
         x3 = self.h2(x2)
         
-        xt = x3.transpose(2, 1)
-        U, S, V = torch.pca_lowrank(xt, q=3, center=True, niter=2)
-        xt = torch.matmul(xt, V[:,:,:3])
-        x3t = xt.transpose(2, 1)
-        
-        feat = torch.cat((x1t,x2t,x3t),dim=1)
+    
+        #feat = torch.cat((x1t,x2t,x3t),dim=1)
         
         #torch.pca_lowrank(x3, q=None, center=True, niter=2)
         #x = {'out':x}
 
-        return feat
+        return x3
+    
+    
+
+class PointNet_features(torch.nn.Module):
+    def __init__(self,in_dim=3, dim_k=1024, use_tnet=False, sym_fn=symfn_max, scale=1):
+        super().__init__()
+        mlp_h1 = [int(64/scale), int(64/scale)]
+        mlp_h2 = [int(64/scale), int(128/scale), int(dim_k/scale)]
+
+        self.h1 = MLPNet(in_dim, mlp_h1, b_shared=True).layers
+        self.h2 = MLPNet(mlp_h1[-1], mlp_h2, b_shared=True).layers
+        #self.sy = torch.nn.Sequential(torch.nn.MaxPool1d(num_points), Flatten())
+        self.sy = sym_fn
+
+        self.tnet1 = TNet(in_dim) if use_tnet else None
+        self.tnet2 = TNet(mlp_h1[-1]) if use_tnet else None
+
+        self.flatten = Flatten()
+        self.t_out_t2 = None
+        self.t_out_h1 = None
+
+    def forward(self, points):
+        """ points -> features
+            [B, N, 3] -> [B, K]
+        """
+        B = points.shape[0]
+        P = points.shape[1]
+        C = points.shape[2]
+        points = points.view(B,P,C)
+        #points = points.view()
+        x = points.transpose(1, 2) # [B, 3, N]
+
+        if self.tnet1:
+            t1 = self.tnet1(x)
+            x = t1.bmm(x)
+
+        x2 = self.h1(x)
+
+        
+        if self.tnet2:
+            t2 = self.tnet2(x2)
+            self.t_out_t2 = t2
+            x2 = t2.bmm(x2)
+
+        x3 = self.h2(x2)
+        
+        #torch.pca_lowrank(x3, q=None, center=True, niter=2)
+        #x = {'out':x}
+
+        return x3
 
 
 
