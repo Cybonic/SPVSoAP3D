@@ -49,7 +49,7 @@ if __name__ == '__main__':
         '--experiment', '-e',
         type=str,
         required=False,
-        default='cross_validation/final@range1',
+        default=f'iros24/cross_validation-nonorm-10m-aug-noroi',
         help='Directory to get the trained model.'
     )
 
@@ -57,7 +57,7 @@ if __name__ == '__main__':
         '--resume', '-r',
         type=str,
         required=False,
-        default='None',
+        default='best_model',
         help='Directory to get the trained model.'
     )
 
@@ -88,7 +88,7 @@ if __name__ == '__main__':
         '--batch_size',
         type=int,
         required=False,
-        default=1,
+        default=20,
         help='Directory to get the trained model.'
     )
     parser.add_argument(
@@ -156,7 +156,7 @@ if __name__ == '__main__':
         '--val_set',
         type=str,
         required=False,
-        default = 'uk/strawberry/june23/extracted',
+        default = 'uk/orchards/sum22/extracted',
     )
 
     parser.add_argument(
@@ -288,7 +288,7 @@ if __name__ == '__main__':
     print("*"*30)
 
 
-    loader = dataloader_handler(root_dir,FLAGS.network,FLAGS.dataset,SESSION, roi = FLAGS.roi,pcl_norm = False)
+    loader = dataloader_handler(root_dir,FLAGS.network,FLAGS.dataset,SESSION, roi = FLAGS.roi, pcl_norm = False)
 
     run_name = {'dataset': '-'.join(str(SESSION['val_loader']['sequence'][0]).split('/')),
                 'experiment':os.path.join(FLAGS.experiment,FLAGS.triplet_file,str(FLAGS.max_points)), 
@@ -305,7 +305,6 @@ if __name__ == '__main__':
             device = FLAGS.device,
             run_name = run_name,
             train_epoch_zero = False,
-            debug = False,
             window_roi=  SESSION['eval_roi_window']
             )
     

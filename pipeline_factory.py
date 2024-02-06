@@ -72,7 +72,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
     elif pipeline_name == 'PointNetCovTorch3D':
         pipeline = PointNetCovTroch3DC(output_dim=output_dim, feat_dim = 1024)
     elif pipeline_name == 'PointNetCov3DC':
-        pipeline = PointNetCov3DC(output_dim=output_dim, feat_dim = 512)
+        pipeline = PointNetCov3DC(output_dim=output_dim, feat_dim = 16)
     elif pipeline_name == 'PointNetPCACov3DC':
         pipeline = PointNetPCACov3DC(output_dim=output_dim, feat_dim = 512)
     elif pipeline_name == 'SPCov3D':
