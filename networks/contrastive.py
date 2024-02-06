@@ -30,17 +30,6 @@ class SparseModelWrapper(nn.Module):
             print('ModelWrapper device: ',self.device)
         
 
-    def mean_grad(self):
-        if self.batch_counter == 0:
-            self.batch_counter  = 1 
-
-        for name, param in self.model.named_parameters():
-            if param.requires_grad:
-                param.grad /= self.batch_counter
-
-        self.batch_counter = 0 
-
-
     def forward(self,pcl,**arg):
         self.device =  next(self.parameters()).device
         self.model.to(self.device)
@@ -92,7 +81,8 @@ class SparseModelWrapperLoss(nn.Module):
                         loss        = None,
                         minibatch_size = 3, 
                         device = 'cuda',
-                        class_loss_on = False,
+                        aux_loss_on = 'pairloss',
+                        representation = 'descriptors',
                         class_loss_margin = 0.1,
                         **args,
                         ):
@@ -104,34 +94,27 @@ class SparseModelWrapperLoss(nn.Module):
         self.minibatch_size = minibatch_size
         self.device = device
         self.batch_counter = 0 
-        self.model = model
-        self.pooling = args['pooling']
-        self.class_loss_on     = class_loss_on
+        self.model             = model
+        self.pooling           = args['pooling']
+        
         self.class_loss_margin = class_loss_margin
         self.device = 'cpu'
         
-        self.sec_loss = pcl_binary_loss(**args)
+        self.loss_on = aux_loss_on
         
-        if class_loss_on:
-            self.representation = args['representation']
+        if self.loss_on == 'pairloss':
+            self.sec_loss = pcl_binary_loss(**args)
+        elif self.loss_on == 'segmentloss':
+            self.sec_loss = segment_loss()
         else:
-            self.representation = ''
+            print('No loss specified')   
  
+        self.representation = representation
+            
         try:
             self.device =  next(self.parameters()).device
         except:
             print('ModelWrapper device: ',self.device)
-        
-
-    def mean_grad(self):
-        if self.batch_counter == 0:
-            self.batch_counter  = 1 
-
-        for name, param in self.model.named_parameters():
-            if param.requires_grad:
-                param.grad /= self.batch_counter
-        
-        self.batch_counter = 0 
 
 
     def forward(self,pcl,**arg):
@@ -164,21 +147,26 @@ class SparseModelWrapperLoss(nn.Module):
         # Triplet Loss calculation
         loss_value, info = self.loss(descriptor = descriptor, poses = poses)
         
-        if self.class_loss_on:
+        if self.loss_on == 'pairloss':
             if self.representation == 'features':
                 if self.pooling == 'max':
                     feat = torch.max(feat, dim=1, keepdim=False)[0]
                 elif self.pooling == 'mean':
                     feat = torch.mean(feat, dim=1, keepdim=False)[0]
                 da,dp,dn = feat[anchor_idx],feat[positive_idx],feat[negative_idx]
-            
             else:
                 da,dp,dn = pred[anchor_idx],pred[positive_idx],pred[negative_idx]
+            
+            class_loss_value = self.sec_loss(da,dp,dn)
+            loss_value =  self.class_loss_margin * loss_value + (1-self.class_loss_margin)*class_loss_value
+            info['class_loss'] = class_loss_value.detach()
+            
+        if self.loss_on == 'segmentloss':    
+            if 'labels' not in arg:
+                self.row_labels = arg['labels']
                 
             class_loss_value = self.sec_loss(da,dp,dn)
-            
             loss_value =  self.class_loss_margin * loss_value + (1-self.class_loss_margin)*class_loss_value
-            
             info['class_loss'] = class_loss_value.detach()
         
 
@@ -191,8 +179,8 @@ class SparseModelWrapperLoss(nn.Module):
         
         out = [str(self.model),
                str(self.loss),
-               f'{self.sec_loss}M{self.class_loss_margin}' if self.class_loss_on else '',
-               self.representation if self.class_loss_on else ''
+               f'{self.sec_loss}M{self.class_loss_margin}' if self.loss_on else '',
+               self.representation if self.loss_on=='pairloss' else ''
                ]
         out = '-'.join(out)
         return out
@@ -215,12 +203,12 @@ class ModelWrapper(nn.Module):
         self.batch_counter = 0 
         self.model = model
         self.device = 'cpu'
+        
         try:
             self.device =  next(self.parameters()).device
         except:
             print('ModelWrapper device: ',self.device)
-            
-        
+    
         print('ModelWrapper device: ',self.device)
         
 
@@ -377,7 +365,6 @@ class ModelWrapperLoss(nn.Module):
                         feat = torch.max(feat, dim=1, keepdim=False)[0]
                     elif self.pooling == 'mean':
                         feat = torch.mean(feat, dim=1, keepdim=False)[0]
-                        
                     da,dp,dn = feat[0:a_idx],feat[a_idx:p_idx],feat[p_idx:n_idx]
                 else:
                     da,dp,dn = pred[0:a_idx],pred[a_idx:p_idx],pred[p_idx:n_idx]
@@ -429,6 +416,8 @@ def mlp_layers(nch_input, nch_layers, b_shared=True, bn_momentum=0.1, dropout=0.
         last = outp
     return layers    
 
+
+
 class MLPNet(torch.nn.Module):
     """ Multi-layer perception.
         [B, Cin, N] -> [B, Cout, N] or
@@ -444,7 +433,26 @@ class MLPNet(torch.nn.Module):
         return out
     
 
-# descriptor classification loss
+
+class segment_loss:
+    def __init__(self, w=0.1):
+        self.w = w
+    
+    def forward(self, out, target):
+        
+        target = target.long()
+        correct_targets = target > -1
+        target = target[correct_targets]
+        out = out[correct_targets]
+        
+        loss_c = F.nll_loss(F.log_softmax(out, dim=1), target)
+        #loss_c = self.classloss(
+        #    torch.nn.functional.log_softmax(out, dim=1), target)
+        return loss_c
+    def __str__(self):
+        return "segment_loss"
+    
+
 
 class pcl_binary_loss(torch.nn.Module):
     def __init__(self,in_dim=512,kernels= [256,64],**argv):
