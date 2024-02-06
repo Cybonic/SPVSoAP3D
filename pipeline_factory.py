@@ -16,7 +16,7 @@ from networks.pipelines.MACNet import PointNetMAC,ResNet50MAC
 from networks.pipelines.PointNetSOP import PointNetSOP
 from networks.pipelines.SPCOVP import SPCov3D,PointNetCov3D, PointNetCovTroch3DC,PointNetCov3DC,SPGAP,PointNetPCACov3DC
 from networks.scancontext.scancontext import SCANCONTEXT
-from networks.pipelines.Steerable import SO3MLP
+#from networks.pipelines.Steerable import SO3MLP
 import yaml
 
 from utils import loss as losses
