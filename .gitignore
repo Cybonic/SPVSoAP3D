@@ -22,4 +22,5 @@ Worklog.md
 *.pcd
 *.pkl
 *.log
+*.code-workspace
 

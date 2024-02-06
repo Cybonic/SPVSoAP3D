@@ -16,6 +16,7 @@ from networks.pipelines.MACNet import PointNetMAC,ResNet50MAC
 from networks.pipelines.PointNetSOP import PointNetSOP
 from networks.pipelines.SPCOVP import SPCov3D,PointNetCov3D, PointNetCovTroch3DC,PointNetCov3DC,SPGAP,PointNetPCACov3DC
 from networks.scancontext.scancontext import SCANCONTEXT
+from networks.pipelines.Steerable import SO3MLP
 import yaml
 
 from utils import loss as losses
@@ -63,6 +64,8 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
 
     if pipeline_name == 'LOGG3D':
         pipeline = LOGG3D(output_dim=output_dim)
+    elif pipeline_name == 'SO3MLP':
+        pipeline = SO3MLP(output_dim=output_dim)
     elif pipeline_name == 'SPGAP':
         pipeline = SPGAP(output_dim=output_dim)
     elif pipeline_name == 'PointNetCGAP':
@@ -81,14 +84,15 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
                            do_fc = True,
                            do_pe = True,
                            pres=0.1,
-                           vres=0.1)
+                           vres=0.1,
+                           pooling='layer_cov')
         
     elif pipeline_name == 'PointNetAP':
         pipeline = PointNetAP(output_dim=output_dim, num_points = num_points, feat_dim = 1024)
     elif pipeline_name == 'PointNetSOP':
         pipeline = PointNetSOP(output_dim=output_dim, num_points = num_points, feat_dim = 16)
     elif pipeline_name == 'PointNetVLAD':
-        pipeline = PointNetVLAD(use_tnet=True, output_dim=output_dim, num_points = num_points, feat_dim = 1024)
+        pipeline = PointNetVLAD(use_tnet=False, output_dim=output_dim, num_points = num_points, feat_dim = 1024)
     elif pipeline_name == "PointNetGeM":
         pipeline = PointNetGeM(output_dim=output_dim, num_points = num_points, feat_dim = 1024)
     elif pipeline_name == "ResNet50GeM": 
@@ -209,7 +213,7 @@ def dataloader_handler(root_dir,network,dataset,session,pcl_norm=False,**args):
         num_points=session['max_points']
         modality = SparseLaserScan(voxel_size=0.1,max_points=num_points, pcl_norm = pcl_norm)
     
-    elif network in ['PointNetVLAD','PointNet_ORCHNet',"PointNetGeM","scancontext"] or network.startswith("PointNet"):
+    elif network in ['PointNetVLAD','PointNet_ORCHNet',"PointNetGeM","scancontext","SO3MLP"] or network.startswith("PointNet"):
         
         # Get point cloud based modality
         num_points = session['max_points']
