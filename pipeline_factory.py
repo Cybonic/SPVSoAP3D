@@ -147,19 +147,15 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
                                              pooling = 'max',
                                              **argv['modelwrapper'])
 
-    elif pipeline_name in ['SPCov3D','SPGAP']:
-        
-        features = {
-            'in_dim':2*16,
-            'kernels':[32,16],
-            'representation':'features'
-        }
+    elif pipeline_name in ['SPCov3D','SPGAP'] or pipeline_name.startswith("SPCov3D"):
+        #model_name,lossname = pipeline_name.split("_")
         model = contrastive.SparseModelWrapperLoss(pipeline, 
                                                loss = loss,
                                                device = device,
                                                class_loss_on = True,
                                                class_loss_margin = 0.5, 
                                                pooling = 'max',
+                                               aux_loss_on = 'segmentloss',
                                                **descriptor,
                                                **argv['modelwrapper'])
     
