@@ -3,7 +3,8 @@ import os
 
 full_cap = '--epoch 50'
 args = [
-        '--network PointNetCov3DC',
+        '--network PointNetVLAD',
+        #'--network PointNetPCACov3DC',
         #'--network PointNetVLAD',
         #'--network LOGG3D',
         #'--network SPCov3D',
@@ -29,18 +30,18 @@ losses = ['LazyTripletLoss']
 density = ['10000']
 
 evaluation_type = "cross_validation"
-experiment      = f'-e iros24/{evaluation_type}-nonorm-10m-aug-noroi_0.01voxel'
-input_preprocessing = ' --roi 0 --augmentation 1 --pcl_norm 0'
+experiment      = f'-e iros24/{evaluation_type}-nonorm-10m-aug-noroi'
+input_preprocessing = ' --roi 0 --augmentation 1 --shuffle_points 1 --pcl_norm 0'
 
-resume  = '--resume best_model'
+resume  = '--resume none'
 
 test_sequrnces = [
         '--val_set GEORGIA-FR/husky/orchards/10nov23/00/submaps',
-        #'--val_set uk/orchards/aut22/extracted',
-        #'--val_set uk/strawberry/june23/extracted',
-        #'--val_set greenhouse/e3/extracted', 
-        #'--val_set uk/orchards/sum22/extracted',
-        #'--val_set uk/orchards/june23/extracted'
+        '--val_set uk/orchards/aut22/extracted',
+        '--val_set uk/strawberry/june23/extracted',
+        '--val_set greenhouse/e3/extracted', 
+        '--val_set uk/orchards/sum22/extracted',
+        '--val_set uk/orchards/june23/extracted'
 ]
 
 for seq in test_sequrnces:

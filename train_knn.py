@@ -42,7 +42,7 @@ if __name__ == '__main__':
         '--network', '-m',
         type=str,
         required=False,
-        default='PointNetCov3DC',#'LOGG3D', #SPCov3D
+        default='SPCov3D',#'LOGG3D', #SPCov3D
         help='Directory to get the trained model.'
     )
 
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         '--memory',
         type=str,
         required=False,
-        default='RAM',
+        default='DISK',
         choices=['DISK','RAM'],
         help='Directory to get the trained model.'
     )
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         '--batch_size',
         type=int,
         required=False,
-        default=20,
+        default=10,
         help='Directory to get the trained model.'
     )
     parser.add_argument(
@@ -345,7 +345,7 @@ if __name__ == '__main__':
             config = SESSION,
             device = FLAGS.device,
             run_name = run_name,
-            train_epoch_zero = True,
+            train_epoch_zero = False,
             monitor_range = SESSION['monitor_range'],
             window_roi = FLAGS.eval_roi_window,
             debug = False

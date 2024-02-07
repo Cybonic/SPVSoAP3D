@@ -15,11 +15,11 @@ input_preprocessings = [' --roi 0 --augmentation 1 --pcl_norm 0',
 ]
 
 args = [
-        f'--network PointNetVLAD',
+        f'--network SPCov3D',
         #f'--network SPCov3D',
-        f'--network PointNetMAC',
-        f'--network PointNetSPoC',
-        f'--network overlap_transformer --modality bev',
+        #f'--network PointNetMAC',
+        #f'--network PointNetSPoC',
+        #f'--network overlap_transformer --modality bev',
         #f'--network LOGG3D',
 ]
 
