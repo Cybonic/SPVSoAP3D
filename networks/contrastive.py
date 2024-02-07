@@ -155,6 +155,7 @@ class SparseModelWrapperLoss(nn.Module):
         negative_idx = np.array([idx for idx,label in enumerate(labels) if label == 'negative'])
         
         pred = self.model(sparse_data.to(self.device))
+        
         feat = pred['feat']
         pred = pred['out']
             
@@ -178,7 +179,16 @@ class SparseModelWrapperLoss(nn.Module):
             class_loss_value = self.sec_loss(da,dp,dn)
             
             loss_value =  self.class_loss_margin * loss_value + (1-self.class_loss_margin)*class_loss_value
+            info['class_loss'] = class_loss_value.detach()
             
+        if self.loss_on == 'segmentloss':    
+            #if 'labels' in arg:
+            self.row_labels = torch.tensor(arg['labels'],dtype=torch.float32).to(self.device)
+            #pred[anchor_idx],pred[positive_idx],pred[negative_idx]
+            target = torch.cat((self.row_labels[sparse_index[anchor_idx]],self.row_labels[sparse_index[positive_idx]],self.row_labels[sparse_index[negative_idx]]))
+                
+            class_loss_value = self.sec_loss( pred, target)
+            loss_value =  self.class_loss_margin * loss_value + (1-self.class_loss_margin)*class_loss_value
             info['class_loss'] = class_loss_value.detach()
         
 
@@ -444,7 +454,32 @@ class MLPNet(torch.nn.Module):
         return out
     
 
-# descriptor classification loss
+
+class segment_loss(nn.Module):
+    def __init__(self,num_c=7, feat_dim=256, w=0.1):
+        super().__init__()
+        self.w = w
+        
+        list_layers = mlp_layers(feat_dim, [256, 64], b_shared=False, bn_momentum=0.01, dropout=0.0)
+        list_layers.append(torch.nn.Linear(64, num_c))
+        self.classifier = torch.nn.Sequential(*list_layers)
+    
+    def forward(self, descriptor, target):
+        
+        target = target.long()
+        correct_targets = target > -1
+        target = target[correct_targets]
+        descriptor = descriptor[correct_targets]
+        
+        out = self.classifier(descriptor)
+        loss_c = F.nll_loss(F.log_softmax(out, dim=1), target,reduction='mean')
+        #loss_c = self.classloss(
+        #    torch.nn.functional.log_softmax(out, dim=1), target)
+        return loss_c
+    def __str__(self):
+        return "segment_loss"
+    
+
 
 class pcl_binary_loss(torch.nn.Module):
     def __init__(self,in_dim=512,kernels= [256,64],**argv):
@@ -460,6 +495,7 @@ class pcl_binary_loss(torch.nn.Module):
         anchor = anchor.unsqueeze(1)
         positive = positive.unsqueeze(1)
         negative = negative.unsqueeze(1)
+        
         x1 = torch.cat([anchor,positive],dim=2)
         
         rep_anchor = anchor.repeat(negative.shape[0],1,1)
