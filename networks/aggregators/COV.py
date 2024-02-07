@@ -105,7 +105,8 @@ class COV(nn.Module):
         else:
             x = self._so_meanpool(x)
         if self.do_fc:
-            x = x*F.softmax(self.fc(x),1)
+            x =  self.fc(x)
+            #x = x*F.softmax(self.fc(x),1)
         x = self._l2norm(x)
         return torch.squeeze(x)
     
