@@ -14,7 +14,7 @@ import torch.nn.functional as F
 #from pytorch3d.transforms import Rotate
 import torch.nn as nn
 #from escnn import gspaces
-#from escnn import nn
+from escnn import nn
 #from escnn import group
 
 
