@@ -148,6 +148,7 @@ class SparseModelWrapperLoss(nn.Module):
         # Triplet Loss calculation
         loss_value, info = self.loss(descriptor = descriptor, poses = poses)
         
+        
         if self.loss_on == 'pairloss':
             if self.representation == 'features':
                 if self.pooling == 'max':
@@ -161,8 +162,9 @@ class SparseModelWrapperLoss(nn.Module):
             class_loss_value = self.sec_loss(da,dp,dn)
             loss_value =  self.class_loss_margin * loss_value + (1-self.class_loss_margin)*class_loss_value
             info['class_loss'] = class_loss_value.detach()
-            
-        if self.loss_on == 'segmentloss':    
+        
+        
+        elif self.loss_on == 'segmentloss':    
             #if 'labels' in arg:
             self.row_labels = torch.tensor(arg['labels'],dtype=torch.float32).to(self.device)
             #pred[anchor_idx],pred[positive_idx],pred[negative_idx]
@@ -183,7 +185,7 @@ class SparseModelWrapperLoss(nn.Module):
         out = [str(self.model),
                str(self.loss),
                f'{self.sec_loss}M{self.class_loss_margin}' if self.loss_on else '',
-               self.representation if self.loss_on=='pairloss' else ''
+               self.representation if self.loss_on=='pairloss' or 'segmentloss' else ''
                ]
         out = '-'.join(out)
         return out
