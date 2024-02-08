@@ -160,8 +160,10 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
     
     elif pipeline_name in ['LOGG3D']:
         model = contrastive.SparseModelWrapper(pipeline,loss = loss,device = device,**argv['modelwrapper'])
-    else:
+    elif pipeline_name != "scancontext":
         model = contrastive.ModelWrapper(pipeline,loss =loss,device = device, **argv['modelwrapper'])
+    else: 
+        model = pipeline
 
     print("*"*30)
     print("Model: %s" %(str(model)))
