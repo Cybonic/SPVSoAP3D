@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
-def _so_layer_cov(self, x):
+def _so_layer_cov(x,do_pe=True):
         batchSize, nFeat, dimFeat = x.data.shape
         #x = torch.reshape(x, (-1, dimFeat))
         #x = torch.reshape(x, (-1, dimFeat))
@@ -102,9 +102,10 @@ class COV(nn.Module):
 
     def forward(self, x):
         if self.pooling == 'layer_cov':
-            x = _so_layer_cov(x)
+            x = _so_layer_cov(x,do_pe=self.do_pe)
         else:
             x = self._so_meanpool(x)
+            
         if self.do_fc:
             x =  self.fc(x)
             #x = x*F.softmax(self.fc(x),1)

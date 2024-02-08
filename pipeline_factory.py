@@ -151,7 +151,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
         model = contrastive.SparseModelWrapperLoss(pipeline, 
                                                loss = loss,
                                                device = device,
-                                               class_loss_on = True,
+                                               aux_loss_on = None,
                                                class_loss_margin = 0.5, 
                                                pooling = 'max',
                                                **descriptor,
