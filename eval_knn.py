@@ -396,7 +396,7 @@ class PlaceRecognition():
             metric, self.predictions = eval_row_relocalization(
                                                     self.descriptors, # Descriptors
                                                     self.poses,   # Poses
-                                                    self.row_labels, # Raw labels
+                                                    self.row_labels, # Row labels
                                                     k_top_cand, # Max top candidates
                                                     radius=self.loop_range_distance, # Radius
                                                     window=self.window,
@@ -407,7 +407,7 @@ class PlaceRecognition():
             metric, self.predictions = eval_row_place(self.anchors, # Anchors indices
                                                     self.descriptors, # Descriptors
                                                     self.poses,   # Poses
-                                                    self.row_labels, # Raw labels
+                                                    self.row_labels, # Row labels
                                                     k_top_cand, # Max top candidates
                                                     radius=self.loop_range_distance, # Radius
                                                     window=self.window,

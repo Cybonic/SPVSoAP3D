@@ -42,7 +42,7 @@ if __name__ == '__main__':
         '--network', '-m',
         type=str,
         required=False,
-        default='SPCov3D',#'LOGG3D', #SPCov3D
+        default='PointNetCov3DC',#'LOGG3D', #SPCov3D
         help='Directory to get the trained model.'
     )
 
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         '--experiment', '-e',
         type=str,
         required=False,
-        default='test/loop_range_10m',
+        default='test',
         help='Directory to get the trained model.'
     )
 
@@ -59,7 +59,7 @@ if __name__ == '__main__':
         type=str,
         choices=['none', 'best_model'],
         required=False,
-        default='None',
+        default='none',
         help='Directory to get the trained model.'
     )
 
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         '--memory',
         type=str,
         required=False,
-        default='DISK',
+        default='RAM',
         choices=['DISK','RAM'],
         help='Directory to get the trained model.'
     )
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         '--epoch',
         type=int,
         required=False,
-        default=2,
+        default=10,
         help='Directory to get the trained model.'
     )
     parser.add_argument(
@@ -97,7 +97,14 @@ if __name__ == '__main__':
         '--batch_size',
         type=int,
         required=False,
-        default=10,
+        default=5,
+        help='Directory to get the trained model.'
+    )
+    parser.add_argument(
+        '--eval_batch_size',
+        type=int,
+        required=False,
+        default=20,
         help='Directory to get the trained model.'
     )
     parser.add_argument(
@@ -172,7 +179,7 @@ if __name__ == '__main__':
         '--val_set',
         type=str,
         required=False,
-        default = 'GEORGIA-FR/husky/orchards/10nov23/00/submaps',
+        default = 'uk/orchards/sum22/extracted',
     )
 
     parser.add_argument(
@@ -246,7 +253,7 @@ if __name__ == '__main__':
         SESSION['train_loader']['sequence'] = [FLAGS.val_set]
         SESSION['val_loader']['sequence']   = [FLAGS.val_set]
    
-    SESSION['val_loader']['batch_size'] = FLAGS.batch_size
+    SESSION['val_loader']['batch_size'] = FLAGS.eval_batch_size
     SESSION['train_loader']['triplet_file'] = FLAGS.triplet_file
     SESSION['train_loader']['augmentation'] = FLAGS.augmentation
     SESSION['train_loader']['shuffle_points'] = FLAGS.shuffle_points
@@ -345,7 +352,7 @@ if __name__ == '__main__':
             config = SESSION,
             device = FLAGS.device,
             run_name = run_name,
-            train_epoch_zero = False,
+            train_epoch_zero = True,
             monitor_range = SESSION['monitor_range'],
             window_roi = FLAGS.eval_roi_window,
             debug = False

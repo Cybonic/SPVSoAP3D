@@ -3,8 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
-def _so_layer_cov( x,do_pe=True):
+def _so_layer_cov(self, x):
         batchSize, nFeat, dimFeat = x.data.shape
+        #x = torch.reshape(x, (-1, dimFeat))
         #x = torch.reshape(x, (-1, dimFeat))
         # de-mean
         xmean = torch.mean(x, 1)
@@ -105,7 +106,8 @@ class COV(nn.Module):
         else:
             x = self._so_meanpool(x)
         if self.do_fc:
-            x = x*F.softmax(self.fc(x),1)
+            x =  self.fc(x)
+            #x = x*F.softmax(self.fc(x),1)
         x = self._l2norm(x)
         return torch.squeeze(x)
     

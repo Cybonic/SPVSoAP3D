@@ -22,12 +22,6 @@ class PointNetVLAD(nn.Module):
         y = self.point_net(x)
         x = self.net_vlad(y)
         return x
-
-    def get_backbone_params(self):
-        return self.point_net.parameters()
-
-    def get_classifier_params(self):
-        return self.net_vlad.parameters()
   
     def __str__(self):
         

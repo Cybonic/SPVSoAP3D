@@ -109,7 +109,7 @@ class Trainer(BaseTrainer):
                 
                 param.grad /= batch_size
     
-    def _train_epoch(self, epoch, batch_size = 10 ):
+    def _train_epoch(self, epoch, batch_size = 10):
         
         self.logger.info('\n')
         self.model.train()
@@ -175,7 +175,6 @@ class Trainer(BaseTrainer):
         
         overall_scores = self.eval_approach.run(loop_range=loop_range)
 
-        max_cand = self.top_cand_retrieval[-1]
         # Post on tensorboard
         #recall_scores = overall_scores['recall']
         for range,scores in overall_scores.items():

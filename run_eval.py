@@ -10,7 +10,7 @@ experiments = [f'iros24/{evaluation_type}-nonorm-10m-aug-noroi',
               #f'iros24/{evaluation_type}-nonorm-10m-aug'     
 ]
 
-input_preprocessings = [' --roi 0 --augmentation 1 --pcl_norm 0',
+input_preprocessings = [' --roi 0 --augmentation 0 --pcl_norm 0',
                        #' --roi 30 --augmentation 1 --pcl_norm 0'
 ]
 
@@ -47,7 +47,7 @@ for input_preprocessing,experiment in zip(input_preprocessings,experiments):
                                 '--device cuda',
                                 '--eval_roi_window 100',
                                 '--resume best_model',
-                                f'--chkpt_root {chkpt_root}',
+                                #f'--chkpt_root {chkpt_root}',
                                 f'--save_predictions {os.path.join(save_path,experiment)}',
                                 f'-e {experiment}',
                                 input_preprocessing

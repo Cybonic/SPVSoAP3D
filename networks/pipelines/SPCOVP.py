@@ -8,7 +8,7 @@ from networks.aggregators.COV import *
 from networks.aggregators.pooling import SPoC
 from networks.backbones.spvnas.model_zoo import spvcnn,spvcnnx
 from networks.pipelines.pipeline_utils import *
-from networks.backbones.pointnet import PointNet_features,PointNet_pca
+from networks.backbones.pointnet import PointNet_features
 
 __all__ = ['LOGG3D']
 

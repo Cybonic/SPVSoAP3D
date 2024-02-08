@@ -148,7 +148,6 @@ class SparseModelWrapperLoss(nn.Module):
         # Triplet Loss calculation
         loss_value, info = self.loss(descriptor = descriptor, poses = poses)
         
-        
         if self.loss_on == 'pairloss':
             if self.representation == 'features':
                 if self.pooling == 'max':
@@ -158,6 +157,7 @@ class SparseModelWrapperLoss(nn.Module):
                 da,dp,dn = feat[anchor_idx],feat[positive_idx],feat[negative_idx]
             else:
                 da,dp,dn = pred[anchor_idx],pred[positive_idx],pred[negative_idx]
+            
             
             class_loss_value = self.sec_loss(da,dp,dn)
             loss_value =  self.class_loss_margin * loss_value + (1-self.class_loss_margin)*class_loss_value
@@ -183,10 +183,12 @@ class SparseModelWrapperLoss(nn.Module):
     def __str__(self):
         
         out = [str(self.model),
-               str(self.loss),
-               f'{self.sec_loss}M{self.class_loss_margin}' if self.loss_on else '',
-               self.representation if self.loss_on=='pairloss' or 'segmentloss' else ''
-               ]
+               str(self.loss)]
+        if self.loss_on in ['pairloss','segmentloss']:
+            out.append(f'{self.sec_loss}M{self.class_loss_margin}')
+        if self.loss_on == 'pairloss':
+            out.append(self.representation)
+        #out= np.squeeze(out).tolist()
         out = '-'.join(out)
         return out
     
@@ -208,6 +210,7 @@ class ModelWrapper(nn.Module):
         self.batch_counter = 0 
         self.model = model
         self.device = 'cpu'
+        
         
         try:
             self.device =  next(self.parameters()).device
