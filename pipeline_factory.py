@@ -154,8 +154,8 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
                                                device = device,
                                                class_loss_on = True,
                                                class_loss_margin = 0.5, 
-                                               pooling = 'max',
-                                               aux_loss_on = 'segmentloss',
+                                               pooling = 'max', # Only used when features are used
+                                               aux_loss_on = 'none', # [segmentloss,pairloss,none]
                                                **descriptor,
                                                **argv['modelwrapper'])
     
