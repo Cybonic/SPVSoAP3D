@@ -181,10 +181,12 @@ class SparseModelWrapperLoss(nn.Module):
     def __str__(self):
         
         out = [str(self.model),
-               str(self.loss),
-               f'{self.sec_loss}M{self.class_loss_margin}' if self.loss_on else '',
-               self.representation if self.loss_on=='pairloss' else ''
-               ]
+               str(self.loss)]
+        if self.loss_on in ['pairloss','segmentloss']:
+            out.append(f'{self.sec_loss}M{self.class_loss_margin}')
+        if self.loss_on == 'pairloss':
+            out.append(self.representation)
+        #out= np.squeeze(out).tolist()
         out = '-'.join(out)
         return out
     
