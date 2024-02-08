@@ -339,6 +339,21 @@ class PlaceRecognition():
         file_results = os.path.join(target_dir,'results_recall.csv')
         df.to_csv(file_results)
         self.logger.warning("Saved results at: " + file_results)
+        
+        colum = []
+        rows  = []
+        for value in self.results['precision'].items():
+            keys = value[0]
+            #new = keys[np.isin(keys,colum,invert=True)]
+            colum.append(keys)
+            rows.append(np.round(value[1],3))
+
+        rows = np.array(rows)
+        #rows = np.concatenate((top_cand,rows),axis=1)
+        df = pd.DataFrame(rows.T,columns = colum)
+        file_results = os.path.join(target_dir,'results_precision.csv')
+        df.to_csv(file_results)
+        self.logger.warning("Saved results at: " + file_results)
 
 
 

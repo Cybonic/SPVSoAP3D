@@ -11,6 +11,7 @@ class PointNetVLAD(nn.Module):
     def __init__(self,in_dim=3, feat_dim = 1024, num_points=2500, use_tnet=False, output_dim=1024):
         super(PointNetVLAD, self).__init__()
 
+        self.use_tnet = use_tnet
         self.point_net = PointNet_features(dim_k=feat_dim,use_tnet = use_tnet, scale=1)
         
         self.net_vlad = NetVLADLoupe(feature_size=feat_dim, max_samples=num_points, cluster_size=64,
@@ -23,7 +24,12 @@ class PointNetVLAD(nn.Module):
         return x
   
     def __str__(self):
-        return "PointNetVLAD"
+        
+        out = [f'PointNetVLAD',
+               f'no_tnet' if not self.use_tnet else '',
+               ]
+        outs = ''.join(out)
+        return outs
     
 
 if __name__ == '__main__':

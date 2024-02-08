@@ -3,8 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
-def _so_layer_cov( x,do_pe=True):
+def _so_layer_cov(self, x):
         batchSize, nFeat, dimFeat = x.data.shape
+        #x = torch.reshape(x, (-1, dimFeat))
         #x = torch.reshape(x, (-1, dimFeat))
         # de-mean
         xmean = torch.mean(x, 1)

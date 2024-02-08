@@ -158,11 +158,13 @@ class SparseModelWrapperLoss(nn.Module):
             else:
                 da,dp,dn = pred[anchor_idx],pred[positive_idx],pred[negative_idx]
             
+            
             class_loss_value = self.sec_loss(da,dp,dn)
             loss_value =  self.class_loss_margin * loss_value + (1-self.class_loss_margin)*class_loss_value
             info['class_loss'] = class_loss_value.detach()
-            
-        if self.loss_on == 'segmentloss':    
+        
+        
+        elif self.loss_on == 'segmentloss':    
             #if 'labels' in arg:
             self.row_labels = torch.tensor(arg['labels'],dtype=torch.float32).to(self.device)
             #pred[anchor_idx],pred[positive_idx],pred[negative_idx]
@@ -208,6 +210,7 @@ class ModelWrapper(nn.Module):
         self.batch_counter = 0 
         self.model = model
         self.device = 'cpu'
+        
         
         try:
             self.device =  next(self.parameters()).device
