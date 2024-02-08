@@ -15,7 +15,7 @@ input_preprocessings = [' --roi 0 --augmentation 1 --pcl_norm 0',
 ]
 
 args = [
-        f'--network SPCov3D',
+        f'--network scancontext',
         #f'--network SPCov3D',
         #f'--network PointNetMAC',
         #f'--network PointNetSPoC',

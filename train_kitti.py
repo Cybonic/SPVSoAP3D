@@ -3,7 +3,7 @@ import os
 
 full_cap = '--epoch 50'
 args = [
-        '--network PointNetVLAD',
+        '--network scancontext',
         #'--network PointNetPCACov3DC',
         #'--network PointNetVLAD',
         #'--network LOGG3D',

@@ -41,7 +41,7 @@ if __name__ == '__main__':
         '--network', '-m',
         type=str,
         required=False,
-        default='SPCov3D',
+        default='scancontext',
         help='Directory to get the trained model.'
     )
 
