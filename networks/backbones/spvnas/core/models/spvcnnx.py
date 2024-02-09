@@ -199,7 +199,7 @@ class SPVCNNx(nn.Module):
         z1 = voxel_to_point(x4, z0)
         z1.F = z1.F #+ self.point_transforms[0](z0.F)
 
-        return z1.F 
+        
     
     
         y1 = point_to_voxel(x4, z1)
@@ -227,6 +227,7 @@ class SPVCNNx(nn.Module):
         z3.F = z3.F + self.point_transforms[2](z2.F)
 
         out = self.classifier(z3.F)
-        return out
+        
+        return out, z1.F
 
 

@@ -153,7 +153,10 @@ class SparseModelWrapperLoss(nn.Module):
                 if self.pooling == 'max':
                     feat = torch.max(feat, dim=1, keepdim=False)[0]
                 elif self.pooling == 'mean':
-                    feat = torch.mean(feat, dim=1, keepdim=False)[0]
+                    feat = torch.mean(feat, dim=1, keepdim=False)
+                else:
+                    raise ValueError('Pooling not defined')
+                    
                 da,dp,dn = feat[anchor_idx],feat[positive_idx],feat[negative_idx]
             else:
                 da,dp,dn = pred[anchor_idx],pred[positive_idx],pred[negative_idx]
@@ -187,7 +190,7 @@ class SparseModelWrapperLoss(nn.Module):
         if self.loss_on in ['pairloss','segmentloss']:
             out.append(f'{self.sec_loss}M{self.class_loss_margin}')
         if self.loss_on == 'pairloss':
-            out.append(self.representation)
+            out.append(f'{self.representation}P{self.pooling}')
         #out= np.squeeze(out).tolist()
         out = '-'.join(out)
         return out
