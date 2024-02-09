@@ -14,7 +14,7 @@ from networks.pipelines.overlap_transformer import featureExtracter
 from networks.pipelines.SPoCNet import PointNetSPoC,ResNet50SPoC,PointNetAP,PointNetCGAP
 from networks.pipelines.MACNet import PointNetMAC,ResNet50MAC 
 from networks.pipelines.PointNetSOP import PointNetSOP
-from networks.pipelines.SPCOVP import SPCov3D,PointNetCov3D, PointNetCovTroch3DC,PointNetCov3DC,SPGAP,PointNetPCACov3DC
+from networks.pipelines.SPCOVP import SPCov3D,PointNetCov3D, PointNetCovTroch3DC,PointNetCov3DC,SPGAP,PointNetPCACov3DC,SPCov3Dx
 from networks.scancontext.scancontext import SCANCONTEXT
 #from networks.pipelines.Steerable import SO3MLP
 #from networks.pipelines.Steerable import SO3MLP
@@ -85,7 +85,14 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
                            pres=0.1,
                            vres=0.1,
                            pooling = 'layer_cov')
-        
+    elif pipeline_name == 'SPCov3Dx':
+        pipeline = SPCov3Dx(output_dim=output_dim,
+                           local_feat_dim=16,
+                           do_fc = True,
+                           do_pe = True,
+                           pres=0.1,
+                           vres=0.1,
+                           pooling = 'layer_cov')
     elif pipeline_name == 'PointNetAP':
         pipeline = PointNetAP(output_dim=output_dim, num_points = num_points, feat_dim = 1024)
     elif pipeline_name == 'PointNetSOP':
@@ -148,13 +155,20 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
 
     elif pipeline_name in ['SPCov3D','SPGAP'] or pipeline_name.startswith("SPCov3D"):
         #model_name,lossname = pipeline_name.split("_")
+        
+        features_l1 = { # features are pooled from the L1 layer
+            'in_dim':2*163,
+            'kernels':[163,64],
+            'representation':'features'
+        }
+        
         model = contrastive.SparseModelWrapperLoss(pipeline, 
                                                loss = loss,
                                                device = device,
-                                               aux_loss_on = None,
-                                               class_loss_margin = 0.5, 
+                                               aux_loss_on = 'pairloss', # 'pairloss' or 'segmentloss'
+                                               class_loss_margin = 0.1, 
                                                pooling = 'max',
-                                               **descriptor,
+                                               **features_l1,
                                                **argv['modelwrapper'])
     
     elif pipeline_name in ['LOGG3D']:
@@ -203,7 +217,7 @@ def dataloader_handler(root_dir,network,dataset,session,pcl_norm=False,**args):
         elif session['modality'] == "spherical" or network != "overlap_transformer":
             modality = SphericalProjection(256,256,square_roi=roi)
             
-    elif network in ['LOGG3D','SPCov3D','SPGAP'] or network.startswith("spvcnn"):
+    elif network in ['LOGG3D','SPGAP'] or network.startswith("SPCov3D"):
         
         # Get sparse (voxelized) point cloud based modality
         num_points=session['max_points']
