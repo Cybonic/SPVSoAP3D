@@ -193,8 +193,6 @@ def dataloader_handler(root_dir,network,dataset,session,pcl_norm=False,**args):
     assert dataset in ['kitti','orchard-uk','uk','GreenHouse','greenhouse'],'Dataset Name does not exist!'
 
     sensor_pram = yaml.load(open("dataloader/sensor-cfg.yaml", 'r'),Loader=yaml.FullLoader)
-    #sensor_pram = sensor_pram[dataset]
-
 
     roi = None
     if 'roi' in args and args['roi'] > 0:
