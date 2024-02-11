@@ -1,9 +1,9 @@
 
 import os
 
-full_cap = '--epoch 50'
+full_cap = '--epoch 20'
 args = [
-        '--network scancontext',
+        '--network SPCov3Dx',
         #'--network PointNetPCACov3DC',
         #'--network PointNetVLAD',
         #'--network LOGG3D',

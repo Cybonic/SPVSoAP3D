@@ -11,8 +11,7 @@
 
 '''
 
-Version: 3.1 
- - pretrained model is automatically loaded based on the model and session names 
+Scancontext requires Batch size of 1
  
 '''
 import argparse
@@ -88,7 +87,7 @@ if __name__ == '__main__':
         '--batch_size',
         type=int,
         required=False,
-        default=20,
+        default=1,
         help='Directory to get the trained model.'
     )
     parser.add_argument(
