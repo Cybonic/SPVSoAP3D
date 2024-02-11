@@ -30,7 +30,7 @@ losses = ['LazyTripletLoss']
 density = ['10000']
 
 evaluation_type = "cross_validation"
-experiment      = f'-e iros24/{evaluation_type}-nonorm-10m-aug-noroi'
+experiment      = f'-e iros24_ablation/{evaluation_type}-nonorm-10m-aug-noroi'
 input_preprocessing = ' --roi 0 --augmentation 1 --shuffle_points 1 --pcl_norm 0'
 
 resume  = '--resume none'

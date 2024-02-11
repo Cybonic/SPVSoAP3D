@@ -3,13 +3,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 
-def _so_layer_cov(x,do_pe=True):
+def _so_layer_cov(x,do_pe=True,do_dm=True):
         batchSize, nFeat, dimFeat = x.data.shape
         #x = torch.reshape(x, (-1, dimFeat))
         #x = torch.reshape(x, (-1, dimFeat))
         # de-mean
-        xmean = torch.mean(x, 1)
-        x = x - xmean.unsqueeze(1)
+        if do_dm:
+            xmean = torch.mean(x, 1)
+            x = x - xmean.unsqueeze(1)
         
         x = x.unsqueeze(-1)
         x = x.matmul(x.transpose(3, 2))
@@ -61,12 +62,13 @@ class COVtorch(nn.Module):
     
 
 class COV(nn.Module):
-    def __init__(self, thresh=1e-8, do_pe=True,  do_fc=True, input_dim=16, is_tuple=False,output_dim=256,pooling='bach_cov',**kwargs):
+    def __init__(self, thresh=1e-8, do_pe=True,  do_fc=True, do_dm=True, input_dim=16, is_tuple=False,output_dim=256,pooling='bach_cov',**kwargs):
         super(COV, self).__init__()
         self.thresh = thresh
         self.sop_dim = input_dim * input_dim
         self.do_fc = do_fc
         self.do_pe = do_pe
+        self.do_dm = do_dm
         self.is_tuple = is_tuple
         self.fc = nn.LazyLinear( output_dim)
         self.pooling = pooling
@@ -102,7 +104,7 @@ class COV(nn.Module):
 
     def forward(self, x):
         if self.pooling == 'layer_cov':
-            x = _so_layer_cov(x,do_pe=self.do_pe)
+            x = _so_layer_cov(x,do_pe=self.do_pe,do_dm = self.do_dm)
         else:
             x = self._so_meanpool(x)
             
@@ -118,6 +120,7 @@ class COV(nn.Module):
                  self.pooling,
                  "fc" if self.do_fc else "no_fc",
                  "pe" if self.do_pe else "no_pe",
+                 "dm" if self.do_dm else "no_dm",
                  ]
         return '-'.join(stack)
  

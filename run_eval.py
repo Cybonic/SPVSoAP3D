@@ -43,7 +43,7 @@ for input_preprocessing,experiment in zip(input_preprocessings,experiments):
                         func_arg = [arg,
                                 seq,
                                 f'--model_evaluation {evaluation_type}',
-                                '--memory RAM',
+                                '--memory DISK',
                                 '--device cuda',
                                 '--eval_roi_window 100',
                                 '--resume best_model',
