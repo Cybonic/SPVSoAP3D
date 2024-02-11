@@ -81,7 +81,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
         pipeline = SPCov3D(output_dim=output_dim,
                            local_feat_dim=16,
                            do_fc = True,
-                           do_pe = True,
+                           do_pe = False,
                            pres=0.1,
                            vres=0.1,
                            pooling = 'layer_cov')
@@ -165,7 +165,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
         model = contrastive.SparseModelWrapperLoss(pipeline, 
                                                loss = loss,
                                                device = device,
-                                               aux_loss_on = 'pairloss', # 'pairloss' or 'segmentloss'
+                                               aux_loss_on = 'none', # 'pairloss' or 'segmentloss'
                                                class_loss_margin = 0.1, 
                                                pooling = 'max',
                                                **features_l1,
