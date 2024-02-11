@@ -81,7 +81,8 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
         pipeline = SPCov3D(output_dim=output_dim,
                            local_feat_dim=16,
                            do_fc = True,
-                           do_pe = True,
+                           do_pe = False,
+                           do_dm = True,
                            pres=0.1,
                            vres=0.1,
                            pooling = 'layer_cov')
@@ -90,6 +91,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
                            local_feat_dim=16,
                            do_fc = True,
                            do_pe = True,
+                           do_dm = True,
                            pres=0.1,
                            vres=0.1,
                            pooling = 'layer_cov')
@@ -165,7 +167,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
         model = contrastive.SparseModelWrapperLoss(pipeline, 
                                                loss = loss,
                                                device = device,
-                                               aux_loss_on = 'pairloss', # 'pairloss' or 'segmentloss'
+                                               aux_loss_on = None, # None 'pairloss' or 'segmentloss'
                                                class_loss_margin = 0.1, 
                                                pooling = 'max',
                                                **features_l1,
@@ -216,7 +218,6 @@ def dataloader_handler(root_dir,network,dataset,session,pcl_norm=False,**args):
             modality = SphericalProjection(256,256,square_roi=roi)
             
     elif network in ['LOGG3D','SPGAP'] or network.startswith("SPCov3D"):
-        
         # Get sparse (voxelized) point cloud based modality
         num_points=session['max_points']
         modality = SparseLaserScan(voxel_size=0.1,max_points=num_points, pcl_norm = pcl_norm)
