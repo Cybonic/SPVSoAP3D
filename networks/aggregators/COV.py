@@ -120,6 +120,7 @@ class COV(nn.Module):
                  self.pooling,
                  "fc" if self.do_fc else "no_fc",
                  "pe" if self.do_pe else "no_pe",
+                 "dm" if self.do_dm else "no_dm",
                  ]
         return '-'.join(stack)
  
