@@ -16,6 +16,7 @@ from networks.pipelines.MACNet import PointNetMAC,ResNet50MAC
 from networks.pipelines.PointNetSOP import PointNetSOP
 from networks.pipelines.SPCOVP import SPCov3D,PointNetCov3D, PointNetCovTroch3DC,PointNetCov3DC,SPGAP,PointNetPCACov3DC,SPCov3Dx
 from networks.scancontext.scancontext import SCANCONTEXT
+from networks.pipelines.SPVSoAP3D import SPVSoAP3D
 #from networks.pipelines.Steerable import SO3MLP
 #from networks.pipelines.Steerable import SO3MLP
 import yaml
@@ -77,6 +78,17 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
         pipeline = PointNetCov3DC(output_dim=output_dim, feat_dim = 512)
     elif pipeline_name == 'PointNetPCACov3DC':
         pipeline = PointNetPCACov3DC(output_dim=output_dim, feat_dim = 512)
+    elif pipeline_name == 'SPVSoAP3D':
+        pipeline = SPVSoAP3D(output_dim=output_dim,
+                           local_feat_dim=16,
+                           do_fc  = True,
+                           do_pe  = False,
+                           do_log = True,
+                           do_pwnorm=True,
+                           pres=0.1,
+                           vres=0.1,
+                           )
+        
     elif pipeline_name == 'SPCov3D':
         pipeline = SPCov3D(output_dim=output_dim,
                            local_feat_dim=16,
@@ -156,7 +168,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
                                              pooling = 'max',
                                              **argv['modelwrapper'])
 
-    elif pipeline_name in ['SPCov3D','SPGAP'] or pipeline_name.startswith("SPCov3D"):
+    elif pipeline_name in ['SPCov3D','SPGAP'] or pipeline_name.startswith("SPV"):
         #model_name,lossname = pipeline_name.split("_")
         
         features_l1 = { # features are pooled from the L1 layer
@@ -218,7 +230,7 @@ def dataloader_handler(root_dir,network,dataset,session,pcl_norm=False,**args):
         elif session['modality'] == "spherical" or network != "overlap_transformer":
             modality = SphericalProjection(256,256,square_roi=roi)
             
-    elif network in ['LOGG3D','SPGAP'] or network.startswith("SPCov3D"):
+    elif network in ['LOGG3D','SPGAP'] or network.startswith("SPV"):
         # Get sparse (voxelized) point cloud based modality
         num_points=session['max_points']
         modality = SparseLaserScan(voxel_size=0.1,max_points=num_points, pcl_norm = pcl_norm)
