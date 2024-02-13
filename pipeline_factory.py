@@ -80,9 +80,10 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
     elif pipeline_name == 'SPCov3D':
         pipeline = SPCov3D(output_dim=output_dim,
                            local_feat_dim=16,
-                           do_fc = True,
-                           do_pe = True,
-                           do_dm = False,
+                           do_fc  = True,
+                           do_pe  = False,
+                           do_dm  = False,
+                           do_log = True,
                            pres=0.1,
                            vres=0.1,
                            pooling = 'layer_cov')
