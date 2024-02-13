@@ -14,8 +14,8 @@ class SoAP(nn.Module):
                  epsilon=1e-8, 
                  do_fc=True, 
                  do_log=True, 
-                 do_power_norm = True,
-                 do_pe = True,
+                 do_pn = True,
+                 do_epn = True,
                  input_dim=16, 
                  output_dim=256,
                  **kwargs):
@@ -23,10 +23,10 @@ class SoAP(nn.Module):
         
         self.do_fc = do_fc
         self.do_log = do_log
-        self.do_pe = do_pe
-        self.do_power_norm = do_power_norm
-        # power norm over PE
-        self.do_pe = False if do_power_norm or do_log else self.do_pe
+        self.do_epn = do_epn
+        self.do_pn = do_pn
+        # power norm over  eigen-value power normalization
+        self.do_epn = False if do_pn or do_log else self.do_epn
         
         self.input_dim = input_dim
         self.epsilon = epsilon
@@ -35,15 +35,23 @@ class SoAP(nn.Module):
     
     def __str__(self):
         
+        pn_str = "pn" 
+        if self.do_epn and not self.do_pn:
+            pn_str = "epn"
+        elif not self.do_epn and not self.do_pn:
+            pn_str = "no_pn"
+        
         stack = ["SoAP" ,
                  "log" if self.do_log else "no_log",
-                 "pownorm" if self.do_power_norm else "no_pownorm",
-                 "pe" if self.do_pe else "no_pe",
+                 pn_str,
                   "fc" if self.do_fc else "no_fc",
                  ]
         return '-'.join(stack)
     
-    def _pe(self,x):
+    def _epn(self,x):
+        """
+        Eigen-value Power Normalization over the positive semi-definite matrix.
+        """
         u_, s_, v_ = torch.svd(x)
         s_alpha = torch.pow(s_, 0.5)
         x =torch.matmul(torch.matmul(u_, torch.diag_embed(s_alpha)), v_.transpose(-2, -1))
@@ -57,11 +65,6 @@ class SoAP(nn.Module):
         u, s, v = torch.linalg.svd(x)
         s = s.clamp(min=self.epsilon)  # clamp to avoid log(0)
         x=torch.matmul(torch.matmul(u, torch.diag_embed(torch.log(s))), v)
-        x = x.clamp(min=self.epsilon)
-        # Power Normalization.
-        #h=0.75 
-        self.p.clamp(min=self.epsilon, max=1.0)
-        x = torch.sign(x)*torch.pow(torch.abs(x),self.p)
         x = x.clamp(min=self.epsilon)
             
         return x.float()
@@ -86,21 +89,17 @@ class SoAP(nn.Module):
         x = x.unsqueeze(-1)
         x = x.matmul(x.transpose(3, 2))
 
-        
-        # Average pooling
-        #x = torch.reshape(x, (batchSize, nPoints, dimFeat, dimFeat))
-        x = torch.mean(x, 1)
-        #print(x.data.shape)
-        #x = torch.reshape(x, (-1, dimFeat, dimFeat))
-        
+        # Averaging over the points
+        x = torch.mean(x, 1) 
+
         if self.do_log:
             x = self._log(x)
             
-        if self.do_power_norm:
+        if self.do_pn:
             x = self._pow_norm(x)
         
-        if self.do_pe:
-            x = self._pe(x)
+        if self.do_epn:
+            x = self._epn(x)
         
         # Flatten
         x = x.reshape(batchSize, -1)   
