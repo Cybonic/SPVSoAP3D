@@ -142,7 +142,7 @@ class SoAP(nn.Module):
         
         # Flatten
         x = x.reshape(batchSize, -1)   
-         
+        x = x.float()
         if self.do_fc:
             x =  self.fc(x)
             #x = x*F.softmax(self.fc(x),1)
