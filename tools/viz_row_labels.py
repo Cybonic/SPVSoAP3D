@@ -95,15 +95,15 @@ def viz_overlap(xy, loops, record_gif= False, file_name = 'anchor_positive_pair.
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='Play back images from a given directory')
-    parser.add_argument('--root', type=str, default='/home/deep/Dropbox/SHARE/DATASET')
+    parser.add_argument('--root', type=str, default='/home/deep/workspace/DATASET')
     parser.add_argument('--dynamic',default  = 1 ,type = int)
     parser.add_argument('--dataset',
-                                    default = 'GEORGIA-FR',
+                                    default = 'uk',
                                     type= str,
                                     help='dataset root directory.'
                                     )
     
-    parser.add_argument('--seq',default  = "husky/orchards/10nov23/00/submaps_100000",type = str)
+    parser.add_argument('--seq',default  = "strawberry/june23/extracted",type = str)
     parser.add_argument('--show',default  = True ,type = bool)
     parser.add_argument('--pose_data_source',default  = "positions" ,type = str, choices = ['gps','poses'])
     parser.add_argument('--debug_mode',default  = False ,type = bool, 
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     parser.add_argument('--load_labels',default  = False ,type = bool,
                         help='load labels from a pickle file')
     
-    
+
     args = parser.parse_args()
 
 
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     
     device_name = os.uname()[1]
     pc_config = yaml.safe_load(open("sessions/pc_config.yaml", 'r'))
-    root_dir = pc_config[device_name]
+    root_dir = root#pc_config[device_name]
 
     print("[INF] Root directory: %s\n"% root_dir)
 
@@ -154,7 +154,11 @@ if __name__ == "__main__":
    
     
     assert args.pose_data_source in ['gps','poses','positions'], "Invalid pose data source"
-    pose_file = os.path.join(dir_path,f'{args.pose_data_source}.txt')
+    
+    
+    pose_file = os.path.join(dir_path,'tempv2',f'{args.pose_data_source}.txt')
+    
+    
     poses = load_positions(pose_file)
 
     print("[INF] Reading poses from: %s"% pose_file)
@@ -164,7 +168,7 @@ if __name__ == "__main__":
     # Load Row Labels
     if args.load_labels:
         labels = []
-        row_label_file = os.path.join(root_dir,dataset,seq,'extracted','point_row_labels.pkl')
+        row_label_file = os.path.join(root_dir,dataset,seq,'point_row_labels.pkl')
         assert os.path.isfile(row_label_file), "Row label file does not exist " + row_label_file
         with open(row_label_file, 'rb') as f:
             labels = pickle.load(f)

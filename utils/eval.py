@@ -176,9 +176,7 @@ def eval_row_relocalization(descriptrs,poses, row_labels, n_top_cand=25,radius=[
     ignore_indices = window + 10
     
   queries = all_indices[ignore_indices:]
-  
-  loop_cands = []
-  loop_scores= []
+
   gt_loops   = []
   
   predictions = {}
