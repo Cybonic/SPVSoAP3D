@@ -6,7 +6,43 @@ import numpy as np
 def _l2norm(x):
     x = nn.functional.normalize(x, p=2, dim=-1)
     return x
-    
+def is_batch_symmetric(matrices):
+  """Checks if all matrices in a batch are symmetric.
+
+  Args:
+      matrices: A PyTorch tensor of shape (batch_size, matrix_dim, matrix_dim).
+
+  Returns:
+      A boolean tensor of shape (batch_size,) indicating symmetry for each matrix.
+  """
+  return torch.allclose(matrices, matrices.transpose(1, 2))
+
+def is_symmetric(matrix):
+  """Checks if a matrix is symmetric by comparing it with its transpose.
+
+  Args:
+      matrix: A PyTorch tensor representing the matrix.
+
+  Returns:
+      True if the matrix is symmetric, False otherwise.
+  """
+  return torch.allclose(matrix, matrix.T)
+
+def is_positive_definite_direct(matrix):
+  """Checks if a matrix is positive definite using direct verification (expensive).
+
+  Args:
+      matrix: A PyTorch tensor representing the matrix.
+
+  Returns:
+      True if the matrix is positive definite, False otherwise.
+  """
+  for v in torch.randn(matrix.data.size(1), **matrix.data.size()):  # Generate random vectors
+    if torch.dot(v.T @ matrix @ v, v) <= 0:
+      return False
+  return True
+
+
     
 class SoAP(nn.Module):
     def __init__(self, 
@@ -59,9 +95,12 @@ class SoAP(nn.Module):
   
             
     def _log(self,x):
-        
+        # Log-Euclidean Tangent Space Mapping
         # Inspired by -> Semantic Segmentation with Second-Order Pooling
         # Implementation -> https://stackoverflow.com/questions/73288332/is-there-a-way-to-compute-the-matrix-logarithm-of-a-pytorch-tensor
+        # x must be a symmetric positive definite (SPD) matrix
+        # assert is_batch_symmetric(x) # and is_positive_definite_direct(x)
+        
         u, s, v = torch.linalg.svd(x)
         s = s.clamp(min=self.epsilon)  # clamp to avoid log(0)
         x=torch.matmul(torch.matmul(u, torch.diag_embed(torch.log(s))), v)
