@@ -75,12 +75,12 @@ if __name__ == "__main__":
     parser.add_argument('--root', type=str, default='/home/deep/workspace/DATASET')
     parser.add_argument('--dynamic',default  = 1 ,type = int)
     parser.add_argument('--dataset',
-                                    default = 'GEORGIA-FR',
+                                    default = 'greenhouse',
                                     type= str,
                                     help='dataset root directory.'
                                     )
     
-    parser.add_argument('--seq',default  = "husky/orchards/10nov23/00/submaps",type = str)
+    parser.add_argument('--seq',default  = "e3/extracted",type = str)
     parser.add_argument('--plot_path',default  = True ,type = bool)
     parser.add_argument('--record_gif',default  = True ,type = bool)
     parser.add_argument('--pose_data_source',default  = "positions" ,type = str, choices = ['gps','poses'])
@@ -109,8 +109,8 @@ if __name__ == "__main__":
     log.append("[INF] record gif Flag: " + str(record_gif_flag))
  
     ground_truth = {'pos_range': 10,
-                    'warmupitrs': 500, # Number of frames to ignore at the beguinning
-                    'roi': 500,
+                    'warmupitrs': 100, # Number of frames to ignore at the beguinning
+                    'roi': 100,
                     'anchor_range': 0}
     
     
