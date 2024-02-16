@@ -62,7 +62,7 @@ class SoAP(nn.Module):
         self.do_epn = do_epn
         self.do_pn = do_pn
         # power norm over  eigen-value power normalization
-        self.do_epn = False if do_pn or do_log else self.do_epn
+        self.do_epn = False if do_pn else self.do_epn
         
         self.input_dim = input_dim
         self.epsilon = epsilon
@@ -91,7 +91,7 @@ class SoAP(nn.Module):
         u_, s_, v_ = torch.svd(x)
         s_alpha = torch.pow(s_, 0.5)
         x =torch.matmul(torch.matmul(u_, torch.diag_embed(s_alpha)), v_.transpose(-2, -1))
-        return x
+        return x.float()
   
             
     def _log(self,x):
@@ -100,7 +100,7 @@ class SoAP(nn.Module):
         # Implementation -> https://stackoverflow.com/questions/73288332/is-there-a-way-to-compute-the-matrix-logarithm-of-a-pytorch-tensor
         # x must be a symmetric positive definite (SPD) matrix
         # assert is_batch_symmetric(x) # and is_positive_definite_direct(x)
-        
+        x = x.double()
         u, s, v = torch.linalg.svd(x)
         s = s.clamp(min=self.epsilon)  # clamp to avoid log(0)
         x=torch.matmul(torch.matmul(u, torch.diag_embed(torch.log(s))), v)
@@ -120,7 +120,7 @@ class SoAP(nn.Module):
     
     
     def forward(self, x):
-        x = x.double()
+        
         x = x.clamp(min=self.epsilon)
         
         # Outer product
@@ -144,6 +144,7 @@ class SoAP(nn.Module):
         x = x.reshape(batchSize, -1)   
         x = x.float()
         if self.do_fc:
+            assert x.shape[1] == 256
             x =  self.fc(x)
             #x = x*F.softmax(self.fc(x),1)
         
