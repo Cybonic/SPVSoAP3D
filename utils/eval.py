@@ -131,7 +131,7 @@ def eval_place(queries,descriptrs,poses,k=25,radius=[25],reranking = None,window
 
 
 
-def eval_row_relocalization(descriptrs,poses, row_labels, n_top_cand=25, radius=[25],window=1,warmup = 1, sim='L2'):
+def eval_row_relocalization(descriptrs,poses, row_labels, n_top_cand=25, radius=[25],window=1,warmup = 100, sim='L2'):
   """_summary_
 
   Args:
@@ -171,7 +171,7 @@ def eval_row_relocalization(descriptrs,poses, row_labels, n_top_cand=25, radius=
   
   metric = reloc_metrics(n_top_cand,radius)
 
-  ignore_indices = 100
+  ignore_indices = warmup
   if ignore_indices < window:
     ignore_indices = window + 10
     
