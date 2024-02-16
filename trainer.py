@@ -120,11 +120,14 @@ class Trainer(BaseTrainer):
         min_label = np.min(row_labels)
         
         dataloader = iter(self.train_loader)
+        n_samples = len(self.train_loader)
         tbar = tqdm(range(len(self.train_loader)), ncols=80)
 
         self._reset_metrics()
         epoch_loss_list = {}
         epoch_loss = 0
+        
+        batch_norm = []
         
         self.optimizer.zero_grad()
         for batch_idx in tbar:
@@ -152,12 +155,19 @@ class Trainer(BaseTrainer):
                 self.optimizer.step()
                 self.optimizer.zero_grad()
                 
-            
+            # Monitor the gradient norm
+            param = {'params': filter(lambda p:p.requires_grad, self.model.parameters())}
+            for layer in param['params']:
+                if layer.grad is None:
+                    continue
+                norm_grad = layer.grad.norm()
+                batch_norm.append(norm_grad.detach().cpu().numpy().item())
 
         epoch_perfm = {}
         for key,value in epoch_loss_list.items():
             epoch_perfm[key] = np.mean(value)
         
+        epoch_perfm['grad_norm'] = np.mean(batch_norm)
         epoch_perfm['loss'] = epoch_loss/batch_idx
         self._write_scalars_tb('train',epoch_perfm,epoch)
 
