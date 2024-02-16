@@ -154,20 +154,22 @@ class Trainer(BaseTrainer):
                 self.mean_grad(batch_size)
                 self.optimizer.step()
                 self.optimizer.zero_grad()
+                #torch.cuda.empty_cache()
                 
-            # Monitor the gradient norm
-            param = {'params': filter(lambda p:p.requires_grad, self.model.parameters())}
-            for layer in param['params']:
-                if layer.grad is None:
-                    continue
-                norm_grad = layer.grad.norm()
-                batch_norm.append(norm_grad.detach().cpu().numpy().item())
+        # Monitor the gradient norm
+        param = {'params': filter(lambda p:p.requires_grad, self.model.parameters())}
+        for layer in param['params']:
+            if layer.grad is None:
+                continue
+            
+            norm_grad = layer.grad.norm()
+            batch_norm.append(norm_grad.detach().cpu().numpy().item())
 
         epoch_perfm = {}
         for key,value in epoch_loss_list.items():
             epoch_perfm[key] = np.mean(value)
         
-        epoch_perfm['grad_norm'] = np.mean(batch_norm)
+        #epoch_perfm['grad_norm'] = np.mean(batch_norm)
         epoch_perfm['loss'] = epoch_loss/batch_idx
         self._write_scalars_tb('train',epoch_perfm,epoch)
 
