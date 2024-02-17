@@ -7,6 +7,11 @@
 - open3d
 - torchpack
 
+
+## Important Commands
+nvidia-smi
+nvcc --version
+
 ## Create conda environment with python:
 ```
 conda create -n pr_env python=3.9.4
@@ -14,14 +19,15 @@ conda activate pr_env
 ```
 ## Install Conda 11.7.0
 ```
-conda install -c "nvidia/label/cuda-11.7.0" cuda-toolkit
+conda install -c "nvidia/label/cuda-11.7.0" cuda-toolkit -> Ubuntu 22.04
+conda install -c "nvidia/label/cuda-11.4.0" cuda-toolkit -> ubuntu 20.02 drivers 450.80.02
 ```
 ## Install Pytorch 2.0.1
 
 ```
 conda install pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 pytorch-cuda=11.7 -c pytorch -c nvidia
 import torch
-pu  h
+python -c "import torch; print(torch.cuda.is_available()))
 ```
 ## Install sparse
 ```
