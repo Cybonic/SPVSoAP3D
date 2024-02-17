@@ -6,7 +6,7 @@ chkpt_root = '~/workspace/SPCoV/checkpoints'
 save_path = '~/workspace/SPCoV/predictions'
 evaluation_type = "cross_validation"
 
-experiments = [f'iros24/{evaluation_type}-nonorm-10m-aug-noroi',
+experiments = [f'iros24_ablation/{evaluation_type}-nonorm-10m-aug-noroi',
               #f'iros24/{evaluation_type}-nonorm-10m-aug'     
 ]
 
@@ -15,7 +15,7 @@ input_preprocessings = [' --roi 0 --augmentation 0 --pcl_norm 0',
 ]
 
 args = [
-        f'--network scancontext',
+        f'--network SPVSoAP3D',
         #f'--network SPCov3D',
         #f'--network PointNetMAC',
         #f'--network PointNetSPoC',
@@ -28,12 +28,17 @@ losses = ['LazyTripletLoss']
 density = ['10000']
 
 test_sequences = [
-        '--val_set uk/orchards/sum22/extracted',
-        '--val_set uk/orchards/june23/extracted' ,
-        '--val_set uk/orchards/aut22/extracted',
+        '--val_set GEORGIA-FR/husky/orchards/10nov23/00/submaps',
         '--val_set uk/strawberry/june23/extracted',
         '--val_set greenhouse/e3/extracted', 
-        '--val_set GEORGIA-FR/husky/orchards/10nov23/00/submaps',  
+        '--val_set uk/orchards/aut22/extracted'
+        
+        #'--val_set uk/orchards/sum22/extracted',
+        #'--val_set uk/orchards/june23/extracted' ,
+        #'--val_set uk/orchards/aut22/extracted',
+        #'--val_set uk/strawberry/june23/extracted',
+        #'--val_set greenhouse/e3/extracted', 
+        #'--val_set GEORGIA-FR/husky/orchards/10nov23/00/submaps',  
 ]
 
 

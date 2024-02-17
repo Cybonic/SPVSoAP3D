@@ -33,6 +33,7 @@ class PlaceRecognition():
                     eval_metric,
                     logger,
                     window        = 600,
+                    warmup        = 600,
                     save_deptrs   = True,
                     device        = 'cpu',
                     eval_protocol = 'place',
@@ -52,6 +53,7 @@ class PlaceRecognition():
         self.loader = loader
         self.top_cand = top_cand
         self.window   = window
+        self.warmup   = warmup
   
         self.model_name      = str(self.model).lower()
         self.save_deptrs     = save_deptrs # Save descriptors after being generated 
@@ -75,7 +77,7 @@ class PlaceRecognition():
         
         self.param = {}
         self.param['top_cand']     = top_cand
-        self.param['window']       = window
+        self.param['window']       = warmup
         self.param['eval_metric']  = eval_metric
         self.param['save_deptrs']  = save_deptrs
         self.param['device']       = device
@@ -372,8 +374,7 @@ class PlaceRecognition():
         if not isinstance(self.top_cand,list):
             self.top_cand = [self.top_cand]
         
-        # Check if the results were generated
-        sim = 'L2'        
+        # Check if the results were generated       
         sim_func =  'sc_similarity' if str(self.model).startswith("scancontext") else 'L2'
         
         # GENERATE DESCRIPTORS
@@ -400,6 +401,7 @@ class PlaceRecognition():
                                                     k_top_cand, # Max top candidates
                                                     radius=self.loop_range_distance, # Radius
                                                     window=self.window,
+                                                    warmup=self.warmup,
                                                     sim = sim_func 
                                                     )
         
