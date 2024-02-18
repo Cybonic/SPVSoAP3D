@@ -20,19 +20,43 @@ class BaseTrainer:
         self.model = model
         self.config = config
 
-        self.train_logger = train_logger
-        self.logger = logging.getLogger(self.__class__.__name__)
-        
         self.start_epoch = 0
         self.improved = False
-        self.best_log =None
+        self.best_log = None
         self.device = device
+        
+        self.train_logger = train_logger
+
+        ## Main run name which is used as basis for the tensorboard and log file and checkpoint
+        experiment_name = os.sep.join([run_name['experiment'],run_name['dataset'],run_name['model']])
+        
+        ## LOGGER        
+        os.makedirs('logs', exist_ok=True)
+        experiment_name_log = '_'.join(experiment_name.split(os.sep))
+        
+        log_file = os.path.join('logs',f'{experiment_name_log}.log')
+        self.logger = logging.getLogger(__name__)
+        log_handler = logging.FileHandler(log_file)
+        log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        log_handler.setFormatter(log_formatter)
+        self.logger.addHandler(log_handler)
+        self.logger.setLevel(logging.INFO)
+
+        # Log the config
+        self.logger.info(f'Config: {json.dumps(self.config, indent=4, sort_keys=True)}')
+
+        #self.logger.info(f'Config: {json.dumps(config, indent=4, sort_keys=True)}')
+
+        ## Add Breake line to the log
+        self.logger.info('\n\n')
 
         # SETTING THE DEVICE
         if device in ['gpu','cuda']:
             from utils.utils import get_available_devices
             self.device, availble_gpus = get_available_devices(self.config['n_gpu'])
             #self.model = torch.nn.DataParallel(self.model, device_ids=availble_gpus)
+        
+        self.logger.info(f'Using device: {self.device}')
         
         # only if model has parameters   
         if self.model.parameters():
@@ -49,7 +73,7 @@ class BaseTrainer:
         lr = float(config['optimizer']['args']['lr'])
         trainable_params = [    {'params': filter(lambda p:p.requires_grad, self.model.parameters()),'lr': lr},
                                 #{'params': filter(lambda p:p.requires_grad, self.model.get_backbone_params()),'lr': lr},
-                                # {'params':filter(lambda p:p.requires_grad, self.model.get_classifier_params()),'lr': lr}
+                                # {'params':filter(lambda p:predictions_dirp.requires_grad, self.model.get_classifier_params()),'lr': lr}
                                 ]
 
         self.optimizer = get_instance(torch.optim, 'optimizer', config, trainable_params)
@@ -71,8 +95,8 @@ class BaseTrainer:
             self.early_stoping = cfg_trainer.get('early_stop', math.inf)
 
         # CHECKPOINTS & TENSOBOARD
-        checkpoint_dst_dir = os.sep.join([run_name['experiment'],run_name['dataset'],run_name['model']])
-        self.checkpoint_dir = os.path.join(cfg_trainer['save_dir'], checkpoint_dst_dir)
+        
+        self.checkpoint_dir = os.path.join(cfg_trainer['save_dir'], experiment_name)
         
         if not os.path.isdir(self.checkpoint_dir):
             os.makedirs(self.checkpoint_dir)
@@ -116,9 +140,18 @@ class BaseTrainer:
 
         self.writer_dir = os.path.join(cfg_trainer['log_dir'], writer_run_name)
         self.writer = tensorboard.SummaryWriter(self.writer_dir)
-        print(f'Tensorboard dir: {self.writer_dir}')
+        
+        self.logger.info(f'Checkpoint dir: {self.checkpoint_dir}')
+     
+        #print(f'Tensorboard dir: {self.writer_dir}')
+        self.logger.info(f'Tensorboard dir: {self.writer_dir}')
 
 
+    
+    
+    
+    
+    
     def _get_available_devices(self, n_gpu):
         sys_gpu = torch.cuda.device_count()
         device = 'cpu'
@@ -130,13 +163,17 @@ class BaseTrainer:
             n_gpu = sys_gpu            
             gpu = GPUtil.getAvailable(order = 'first', limit = 1, maxLoad = 0.5, maxMemory = 0.5, includeNan=False, excludeID=[], excludeUUID=[])
             if len(gpu) > 0:
+                
                 print(torch.cuda.get_device_name())
+                self.logger.info(torch.cuda.get_device_name())
                 GPUtil.showUtilization()
                 device = torch.device(f'cuda:{gpu[0]}' if n_gpu > 0 and len(gpu) >0 else 'cpu')
             else:
                 print('No GPU available')
+                self.logger.warning('No GPU available')
 
             print(f'GPU to be used: {gpu[0]}\n')
+            self.logger.info(f'GPU to be used: {gpu[0]}\n')
         
         self.logger.info(f'Detected GPUs: {sys_gpu} Requested: {n_gpu}')
         available_gpus = list(range(n_gpu))
