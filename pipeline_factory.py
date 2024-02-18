@@ -239,7 +239,7 @@ def dataloader_handler(root_dir,network,dataset,session,pcl_norm=False,**args):
         
         # Get point cloud based modality
         num_points = session['max_points']
-        modality = Scan(max_points=num_points,square_roi=roi, pcl_norm = pcl_norm)
+        modality = Scan(max_points=num_points,square_roi=roi, pcl_norm=pcl_norm,clean_zeros=False)
     else:
         raise NotImplementedError("Modality not implemented!")
 

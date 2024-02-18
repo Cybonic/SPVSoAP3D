@@ -100,11 +100,11 @@ class LaserScan:
   """Class that contains LaserScan with x,y,z,r"""
   EXTENSIONS_SCAN = ['.bin']
 
-  def __init__(self, parser = None, max_points = -1, aug=False,**argv):
+  def __init__(self, parser = None, max_points = -1, aug=False,clean_zeros = False, **argv):
 
     self.reset()
     self.parser = parser
-
+    self.clean_zeros = clean_zeros
 
     self.set_pcl_norm_flag = False
     if 'pcl_norm' in argv and argv['pcl_norm'] == True:
@@ -265,7 +265,14 @@ class LaserScan:
 
 
   # ==================================================================
-  def get_points(self):    
+  def get_points(self):
+    
+    if self.clean_zeros:
+      mask = np.logical_and(self.points[:,0]!=0,self.points[:,1]!=0,self.points[:,2]!=0)
+      self.points = self.points[mask,:]
+      self.remissions = self.remissions[mask]
+      
+      
     if self.set_roi_flag:
       self.set_roi()
 
@@ -288,6 +295,7 @@ class LaserScan:
 class Scan(LaserScan):
   def __init__(self,parser = None, max_points = -1,**argv):
     super(Scan,self).__init__(parser,max_points,**argv)
+    
     self.shuffle_points = True if 'shuffle_points' in argv and argv['shuffle_points'] == True else False
     pass
 
@@ -307,6 +315,7 @@ class Scan(LaserScan):
   
   def __call__(self,files,set_augmentation=False,set_shuffle_points=False):
     points,intensity = self.load(files)
+    
     if set_augmentation:
       points = self.set_augmentation(points)
     if set_shuffle_points:
