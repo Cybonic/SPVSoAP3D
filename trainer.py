@@ -40,7 +40,7 @@ class Trainer(BaseTrainer):
         self.hyper_log      = config
         self.loss_dist      = config['loss']['args']['metric']
         
-        logger = logging.getLogger("Training")
+        logger = self.logger
         
         self.eval_metric = config['trainer']['eval_metric']
         self.top_cand_retrieval = config['retrieval']['top_cand']
@@ -57,7 +57,7 @@ class Trainer(BaseTrainer):
                                                 self.val_loader,
                                                 self.top_cand_retrieval,
                                                 self.loss_dist,
-                                                logger,
+                                                self.logger,
                                                 window = window,
                                                 device = self.device,
                                                 eval_protocol = eval_protocol,
@@ -120,7 +120,7 @@ class Trainer(BaseTrainer):
         min_label = np.min(row_labels)
         
         dataloader = iter(self.train_loader)
-        n_samples = len(self.train_loader)
+        n_samples  = len(self.train_loader)
         tbar = tqdm(range(len(self.train_loader)), ncols=80)
 
         self._reset_metrics()
@@ -161,15 +161,16 @@ class Trainer(BaseTrainer):
         for layer in param['params']:
             if layer.grad is None:
                 continue
-            
             norm_grad = layer.grad.norm()
             batch_norm.append(norm_grad.detach().cpu().numpy().item())
 
+        # Update the model after the last batch
         epoch_perfm = {}
         for key,value in epoch_loss_list.items():
             epoch_perfm[key] = np.mean(value)
         
-        #epoch_perfm['grad_norm'] = np.mean(batch_norm)
+        # Update tensorboard with the performance
+        epoch_perfm['grad_norm'] = np.mean(batch_norm)
         epoch_perfm['loss'] = epoch_loss/batch_idx
         self._write_scalars_tb('train',epoch_perfm,epoch)
 
