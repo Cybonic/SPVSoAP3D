@@ -97,7 +97,9 @@ class PlaceRecognition():
         return: None
         '''
         if not os.path.isfile(checkpoint_path):
+            
             print("\n ** File does not exist: "+ checkpoint_path)
+            self.logger.warning("\n ** Generating descriptors!")
             return None
         
         
@@ -128,6 +130,7 @@ class PlaceRecognition():
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
             print('\n ** Created a new directory: ' + target_dir)
+            self.logger.warning('\n ** Created a new directory: ' + target_dir)
         
         file_name = os.path.join(target_dir,'params.yaml')
         with open(file_name, 'w') as file:
@@ -182,6 +185,7 @@ class PlaceRecognition():
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
             print('\n ** Created a new directory: ' + target_dir)
+            self.logger.warning('\n ** Created a new directory: ' + target_dir)
         file = os.path.join(target_dir,'descriptors.torch')
 
         # LOADING DESCRIPTORS
@@ -589,6 +593,7 @@ if __name__ == '__main__':
     # LOAD DEFAULT SESSION PARAM
     session_cfg_file = os.path.join('sessions', FLAGS.dataset.lower() + '.yaml')
     print("Opening session config file: %s" % session_cfg_file)
+    
     SESSION = yaml.safe_load(open(session_cfg_file, 'r'))
 
     device_name = os.uname()[1]
