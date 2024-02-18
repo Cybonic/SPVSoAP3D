@@ -7,30 +7,38 @@ device_name = os.uname()[1]
 pc_config = yaml.safe_load(open("sessions/pc_config.yaml", 'r'))
 root_dir = pc_config[device_name]
 
-
 dataset = "uk"
 
-session_cfg_file = os.path.join('sessions', 'ukfrpt.yaml')
-print("Opening session config file: %s" % session_cfg_file)
-SESSION = yaml.safe_load(open(session_cfg_file, 'r'))
+def get_scan_samples():
 
-seq_names_dict = SESSION['cross_validation']
+    session_cfg_file = os.path.join('sessions', 'ukfrpt.yaml')
+    print("Opening session config file: %s" % session_cfg_file)
+    SESSION = yaml.safe_load(open(session_cfg_file, 'r'))
 
-for test,train in seq_names_dict.items():
-    print("\n")
-    print("="*30)
-    print("test: %s" % test)
-  
-    SESSION['train_loader']['sequence'] = train
-    SESSION['val_loader']['sequence'] = [test]
+    seq_names_dict = SESSION['cross_validation']
+
+    for test,train in seq_names_dict.items():
+        print("\n")
+        print("="*30)
+        print("test: %s" % test)
     
-    loader = dataloader_handler(root_dir,"ResNet50_ORCHNet",dataset,SESSION)
+        SESSION['train_loader']['sequence'] = train
+        SESSION['val_loader']['sequence'] = [test]
+        
+        loader = dataloader_handler(root_dir,"ResNet50_ORCHNet",dataset,SESSION)
 
-    train_loader = loader.get_train_loader()
-    val_loader = loader.get_val_loader()
+        train_loader = loader.get_train_loader()
+        val_loader = loader.get_val_loader()
 
-    print("\n")
-    print("*"*30)
-    print(test)
-    print("train_loader: %s" % len(train_loader))
-    print("test_loader: %s" % len(val_loader))
+        print("\n")
+        print("*"*30)
+        print(test)
+        print("train_loader: %s" % len(train_loader))
+        print("test_loader: %s" % len(val_loader))
+    
+    
+if __name__ == '__main__':
+    get_scan_samples()
+    
+
+
