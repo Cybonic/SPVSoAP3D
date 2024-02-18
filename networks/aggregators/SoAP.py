@@ -47,7 +47,7 @@ def is_positive_definite_direct(matrix):
 class SoAP(nn.Module):
     def __init__(self, 
                  p=0.75,
-                 epsilon=1e-8, 
+                 epsilon=1e-12, 
                  do_fc=True, 
                  do_log=True, 
                  do_pn = True,
@@ -121,7 +121,7 @@ class SoAP(nn.Module):
     
     def forward(self, x):
         
-        x = x.clamp(min=self.epsilon)
+        #x = x.clamp(min=self.epsilon)
         
         # Outer product
         batchSize, nPoints, dimFeat = x.data.shape
