@@ -24,8 +24,8 @@ class cross_validation():
     def get_train_loader(self,debug=False):
         sequence  = self.train_cfg['sequence']
         triplet_files = self.train_cfg['triplet_file']
-        augmentation = self.train_cfg['augmentation']
-        shuffle_points = self.train_cfg['shuffle_points']
+        augmentation = self.train_cfg['augmentation'] if 'augmentation' in self.train_cfg else 0
+        shuffle_points = self.train_cfg['shuffle_points'] if 'shuffle_points' in self.train_cfg else 0
    
         
         #max_points = self.max_points

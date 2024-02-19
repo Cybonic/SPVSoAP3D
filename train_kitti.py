@@ -37,7 +37,7 @@ input_preprocessing = ' --roi 0 --augmentation 1 --shuffle_points 1 --pcl_norm 0
 resume  = '--resume best_model'
 
 test_sequrnces = [
-        '--val_set GEORGIA-FR/husky/orchards/10nov23/00/submaps',
+        #'--val_set GEORGIA-FR/husky/orchards/10nov23/00/submaps',
         '--val_set uk/strawberry/june23/extracted',
         '--val_set greenhouse/e3/extracted', 
         '--val_set uk/orchards/aut22/extracted',
