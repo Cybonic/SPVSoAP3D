@@ -131,7 +131,7 @@ def eval_place(queries,descriptrs,poses,k=25,radius=[25],reranking = None,window
 
 
 
-def eval_row_relocalization(descriptrs,poses, row_labels, n_top_cand=25,radius=[25],reranking = None,window=1,sim='L2'):
+def eval_row_relocalization(descriptrs,poses, row_labels, n_top_cand=25, radius=[25],window=1,warmup = 100, sim='L2'):
   """_summary_
 
   Args:
@@ -171,14 +171,12 @@ def eval_row_relocalization(descriptrs,poses, row_labels, n_top_cand=25,radius=[
   
   metric = reloc_metrics(n_top_cand,radius)
 
-  ignore_indices = 100
+  ignore_indices = warmup
   if ignore_indices < window:
     ignore_indices = window + 10
     
   queries = all_indices[ignore_indices:]
-  
-  loop_cands = []
-  loop_scores= []
+
   gt_loops   = []
   
   predictions = {}
@@ -216,9 +214,9 @@ def eval_row_relocalization(descriptrs,poses, row_labels, n_top_cand=25,radius=[
      # CANDIDATES LOOP
     #delta_dscpts = np.dot(query_destps,selected_desptrs.transpose())
     delta_dscpts = query_destps - selected_desptrs
+    
     embed_sim = np.linalg.norm(delta_dscpts, axis=-1) # Euclidean distance
-    max_value = np.max(embed_sim)
-    min_value = np.min(embed_sim)
+
     # Sort to get the most similar (lowest values) vectors first
     cand_loop_idx = np.argsort(embed_sim)[:n_top_cand]
     cand_dist = gt_euclid_dist[cand_loop_idx]

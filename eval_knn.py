@@ -33,6 +33,7 @@ class PlaceRecognition():
                     eval_metric,
                     logger,
                     window        = 600,
+                    warmup        = 600,
                     save_deptrs   = True,
                     device        = 'cpu',
                     eval_protocol = 'place',
@@ -52,6 +53,7 @@ class PlaceRecognition():
         self.loader = loader
         self.top_cand = top_cand
         self.window   = window
+        self.warmup   = warmup
   
         self.model_name      = str(self.model).lower()
         self.save_deptrs     = save_deptrs # Save descriptors after being generated 
@@ -75,7 +77,7 @@ class PlaceRecognition():
         
         self.param = {}
         self.param['top_cand']     = top_cand
-        self.param['window']       = window
+        self.param['window']       = warmup
         self.param['eval_metric']  = eval_metric
         self.param['save_deptrs']  = save_deptrs
         self.param['device']       = device
@@ -95,7 +97,9 @@ class PlaceRecognition():
         return: None
         '''
         if not os.path.isfile(checkpoint_path):
+            
             print("\n ** File does not exist: "+ checkpoint_path)
+            self.logger.warning("\n ** Generating descriptors!")
             return None
         
         
@@ -126,6 +130,7 @@ class PlaceRecognition():
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
             print('\n ** Created a new directory: ' + target_dir)
+            self.logger.warning('\n ** Created a new directory: ' + target_dir)
         
         file_name = os.path.join(target_dir,'params.yaml')
         with open(file_name, 'w') as file:
@@ -180,6 +185,7 @@ class PlaceRecognition():
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
             print('\n ** Created a new directory: ' + target_dir)
+            self.logger.warning('\n ** Created a new directory: ' + target_dir)
         file = os.path.join(target_dir,'descriptors.torch')
 
         # LOADING DESCRIPTORS
@@ -372,8 +378,7 @@ class PlaceRecognition():
         if not isinstance(self.top_cand,list):
             self.top_cand = [self.top_cand]
         
-        # Check if the results were generated
-        sim = 'L2'        
+        # Check if the results were generated       
         sim_func =  'sc_similarity' if str(self.model).startswith("scancontext") else 'L2'
         
         # GENERATE DESCRIPTORS
@@ -400,6 +405,7 @@ class PlaceRecognition():
                                                     k_top_cand, # Max top candidates
                                                     radius=self.loop_range_distance, # Radius
                                                     window=self.window,
+                                                    warmup=self.warmup,
                                                     sim = sim_func 
                                                     )
         
@@ -587,6 +593,7 @@ if __name__ == '__main__':
     # LOAD DEFAULT SESSION PARAM
     session_cfg_file = os.path.join('sessions', FLAGS.dataset.lower() + '.yaml')
     print("Opening session config file: %s" % session_cfg_file)
+    
     SESSION = yaml.safe_load(open(session_cfg_file, 'r'))
 
     device_name = os.uname()[1]

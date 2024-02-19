@@ -122,8 +122,11 @@ class SparseModelWrapperLoss(nn.Module):
         self.model.to(self.device)
         # Mini Batch training due to memory constrains
         if self.training == False:
+            
             pred = self.model(pcl.to(self.device))
             pred = pred['out']
+            # Check for NaN
+            assert not torch.any(torch.isnan(pred), dim=0).any()
             return(pred)
 
         # Training
@@ -141,6 +144,8 @@ class SparseModelWrapperLoss(nn.Module):
         
         feat = pred['feat']
         pred = pred['out']
+        # Check for NaN
+        assert not torch.any(torch.isnan(pred), dim=0).any()
             
         descriptor = {'a':pred[anchor_idx],'p':pred[positive_idx],'n':pred[negative_idx]}
         poses = {'a':sparse_index[anchor_idx],'p':sparse_index[positive_idx],'n':sparse_index[negative_idx]}

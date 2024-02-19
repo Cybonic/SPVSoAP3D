@@ -193,6 +193,21 @@ if __name__ == '__main__':
     )
     
     parser.add_argument(
+        '--eval_warmup_window',
+        type=float,
+        required=False,
+        default = 100,
+    )
+    
+    parser.add_argument(
+        '--eval_protocol',
+        type=str,
+        required=False,
+        choices=['place','relocalization'],
+        default = 'place',
+    )
+    
+    parser.add_argument(
         '--save_predictions',
         type=str,
         required=False,
@@ -238,11 +253,7 @@ if __name__ == '__main__':
 
     print("----------")
     print("Saving Predictions: %s"%FLAGS.save_predictions)
-    print("\n======= TRAIN LOADER =======")
-    print("Max Points: " + str(SESSION['max_points']))
-    print("Triplet Data File: " + str(FLAGS.triplet_file))
     print("\n======= VAL LOADER =======")
-   
     print("Sequence : ", SESSION['val_loader']['sequence'])
     print("Batch Size : ", str(SESSION['val_loader']['batch_size']))
     print("Max Points: " + str(SESSION['max_points']))
@@ -252,6 +263,7 @@ if __name__ == '__main__':
     print("Loss: ",FLAGS.loss)
     print("MiniBatch Size: ", str(SESSION['modelwrapper']['minibatch_size']))
     print("\n==========================")
+    print(f'Eval Protocal: {FLAGS.eval_protocol}')
     print(f'Memory: {FLAGS.memory}')
     print(f'Device: {FLAGS.device}')
     print("Loss: %s" %(SESSION['loss']['type']))
@@ -304,6 +316,7 @@ if __name__ == '__main__':
             device = FLAGS.device,
             run_name = run_name,
             train_epoch_zero = False,
+            eval_protocol='place',
             window_roi=  SESSION['eval_roi_window']
             )
     

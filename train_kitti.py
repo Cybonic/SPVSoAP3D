@@ -1,9 +1,10 @@
 
 import os
+import subprocess
 
 full_cap = '--epoch 20'
 args = [
-        '--network SPCov3Dx',
+        '--network SPVSoAP3D',
         #'--network PointNetPCACov3DC',
         #'--network PointNetVLAD',
         #'--network LOGG3D',
@@ -21,7 +22,7 @@ args = [
         #f'--memory RAM  --modality bev  --session kitti --model SPoC_resnet50 ',
         #f'--memory RAM  --modality bev  --session kitti --model GeM_resnet50 ',
         #f'--memory RAM  --modality bev  --session kitti --model MuHA_resnet50',
-]
+]       
 
 #losses = ['PositiveLoss','LazyTripletLoss','LazyQuadrupletLoss']
 #losses = ['LazyTripletLoss','LazyQuadrupletLoss']
@@ -33,13 +34,13 @@ evaluation_type = "cross_validation"
 experiment      = f'-e iros24_ablation/{evaluation_type}-nonorm-10m-aug-noroi'
 input_preprocessing = ' --roi 0 --augmentation 1 --shuffle_points 1 --pcl_norm 0'
 
-resume  = '--resume none'
+resume  = '--resume best_model'
 
 test_sequrnces = [
         '--val_set GEORGIA-FR/husky/orchards/10nov23/00/submaps',
-        '--val_set uk/orchards/aut22/extracted',
         '--val_set uk/strawberry/june23/extracted',
         '--val_set greenhouse/e3/extracted', 
+        '--val_set uk/orchards/aut22/extracted',
         '--val_set uk/orchards/sum22/extracted',
         '--val_set uk/orchards/june23/extracted'
 ]
@@ -59,4 +60,26 @@ for seq in test_sequrnces:
                 
                 func_arg_str = ' '.join(func_arg)        
                 #print(func_arg)
+                
+                #try:
+                # Start the child process
+                        #input_data = b"This is the input data"
+                #        command = ["python3", "train_knn.py", str(func_arg_str)]
+                #        process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                #        output, error = process.communicate()
+
+                        # Option 2: Using communicate method with input argument
+                        #process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                       
+
+                        #ans = subprocess.Popen(, text=True)
+                #child_process = subprocess.Popen(["python3", "train_knn.py", str(func_arg_str)],text=True)
+                        #print(ans)
+                        #ans.wait()
+                # Wait for the parent process to be killed
+                # If the parent process is killed, terminate the child process
+                #except subprocess.CalledProcessError as e: 
+                #        print(f"Command failed with return code {e.returncode}")
+                        
+
                 os.system('python3 train_knn.py ' + func_arg_str)

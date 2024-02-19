@@ -72,15 +72,15 @@ def viz_overlap(xy, loops, record_gif= False, file_name = 'anchor_positive_pair.
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='Play back images from a given directory')
-    parser.add_argument('--root', type=str, default='/home/deep/Dropbox/SHARE/DATASET')
+    parser.add_argument('--root', type=str, default='/home/deep/workspace/DATASET')
     parser.add_argument('--dynamic',default  = 1 ,type = int)
     parser.add_argument('--dataset',
-                                    default = 'GEORGIA-FR',
+                                    default = 'greenhouse',
                                     type= str,
                                     help='dataset root directory.'
                                     )
     
-    parser.add_argument('--seq',default  = "husky/orchards/10nov23/00/submaps_100000",type = str)
+    parser.add_argument('--seq',default  = "e3/extracted",type = str)
     parser.add_argument('--plot_path',default  = True ,type = bool)
     parser.add_argument('--record_gif',default  = True ,type = bool)
     parser.add_argument('--pose_data_source',default  = "positions" ,type = str, choices = ['gps','poses'])
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     log.append("[INF] record gif Flag: " + str(record_gif_flag))
  
     ground_truth = {'pos_range': 10,
-                    'warmupitrs': 300, # Number of frames to ignore at the beguinning
+                    'warmupitrs': 100, # Number of frames to ignore at the beguinning
                     'roi': 100,
                     'anchor_range': 0}
     
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     
     device_name = os.uname()[1]
     pc_config = yaml.safe_load(open("sessions/pc_config.yaml", 'r'))
-    root_dir = pc_config[device_name]
+    root_dir = root #pc_config[device_name]
 
     print("[INF] Root directory: %s\n"% root_dir)
     log.append("[INF] Root directory: %s\n"% root_dir)
@@ -156,11 +156,13 @@ if __name__ == "__main__":
 
     # Loading DATA
     from dataloader.kitti.kitti_dataset import load_positions
-    from dataloader.utils import gen_gt_constrained_by_rows,rotate_poses
+    from dataloader.utils import gen_gt_constrained_by_rows
     from dataloader import row_segments
     
     assert args.pose_data_source in ['gps','poses','positions'], "Invalid pose data source"
-    pose_file = os.path.join(dir_path,f'{args.pose_data_source}.txt')
+    
+    
+    pose_file = os.path.join(dir_path,'tempv2',f'{args.pose_data_source}.txt')
     xy = load_positions(pose_file)
 
     print("[INF] Reading poses from: %s"% pose_file)
@@ -177,7 +179,11 @@ if __name__ == "__main__":
     n_points = xy.shape[0]
 
     positive_range_str = str(ground_truth['pos_range'])+'m'
+    roi_str = str(ground_truth['roi'])+'frames'
+    warmupitrs_str = str(ground_truth['warmupitrs'])+'frames'
 
+    
+    name = f'loop_range_{positive_range_str}_roi_{roi_str}_warmup_{warmupitrs_str}'
     print("="*30)
     print("[INF] Number of points: " + str(n_points))
     print("[INF] Number of anchors: " + str(len(anchors)))
@@ -196,7 +202,7 @@ if __name__ == "__main__":
     # Generate Ground-truth Table
     if args.save_eval_data:
         
-        ground_truth_name = f'ground_truth_loop_range_{positive_range_str}'
+        ground_truth_name = f'ground_truth_loop_range_{name}'
         file = os.path.join(save_root_dir,ground_truth_name +'.pkl')
 
          # save the numpy arrays to a file using pickle
@@ -227,7 +233,7 @@ if __name__ == "__main__":
         # set axis limits
         #plt.xlim(0, 100)
         
-        file = os.path.join(save_root_dir,f'anchor_positive_pair_{positive_range_str}.png')
+        file = os.path.join(save_root_dir,f'anchor_positive_pair_{name}.png')
         # show the legend
         #ax.legend()
         plt.savefig(file)
@@ -249,7 +255,7 @@ if __name__ == "__main__":
             table[anchor,positive] = 1
 
         print("[INF] Number of points: " + str(n_points))
-        gif_file = os.path.join(save_root_dir,f'anchor_positive_pair_{positive_range_str}.gif')
+        gif_file = os.path.join(save_root_dir,f'anchor_positive_pair_{name}.gif')
         viz_overlap(xy,table,
                     record_gif = True,
                     file_name  = gif_file,
@@ -259,7 +265,7 @@ if __name__ == "__main__":
         log.append("[INF] Saving gif to: %s"% gif_file)
         
     # Save log file
-    log_file = os.path.join(save_root_dir,f'log_{positive_range_str}.txt')
+    log_file = os.path.join(save_root_dir,f'log_{name}.txt')
     log_tex = '\n'.join(log)
     with open(log_file, 'w') as f:
         f.write(log_tex)
