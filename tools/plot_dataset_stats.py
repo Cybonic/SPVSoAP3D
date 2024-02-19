@@ -35,10 +35,53 @@ def get_scan_samples():
         print(test)
         print("train_loader: %s" % len(train_loader))
         print("test_loader: %s" % len(val_loader))
+
+
+def get_scan_points():
+
+    session_cfg_file = os.path.join('sessions', 'ukfrpt.yaml')
+    print("Opening session config file: %s" % session_cfg_file)
+    SESSION = yaml.safe_load(open(session_cfg_file, 'r'))
+    SESSION['max_points'] = -1
+    
+    seq_names_dict = SESSION['cross_validation']
+
+    for test,train in seq_names_dict.items():
+        print("\n")
+        print("="*30)
+        print("test: %s" % test)
+    
+        SESSION['train_loader']['sequence'] = train
+        SESSION['val_loader']['sequence'] = [test]
+        
+        loader = dataloader_handler(root_dir,"PointNet",dataset,SESSION)
+
+        #train_loader = loader.get_train_loader()
+        val_loader = loader.get_val_loader()
+
+        all_scan_point_count = []
+        # count number of points in each scan
+        for i in range(len(val_loader)):
+            scan, idx = val_loader.dataset[i]
+            scan_np = scan.detach().cpu().numpy()
+            all_scan_point_count.append(scan_np.shape[0])
+            #print(f"scan: {i} has {scan_np.shape[0]} points")
+        
+        import numpy as np
+        av_point_count = np.mean(all_scan_point_count)
+        std_point_count = np.std(all_scan_point_count)
+        print(f"Average point count: {av_point_count}")
+        print(f"Std point count: {std_point_count}")
+        
+    print("\n")
+    print("*"*30)
+    
     
     
 if __name__ == '__main__':
-    get_scan_samples()
+    
+    get_scan_points()
+    #get_scan_samples()
     
 
 

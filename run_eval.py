@@ -28,13 +28,13 @@ losses = ['LazyTripletLoss']
 density = ['10000']
 
 test_sequences = [
-        '--val_set GEORGIA-FR/husky/orchards/10nov23/00/submaps',
-        '--val_set uk/strawberry/june23/extracted',
-        '--val_set greenhouse/e3/extracted', 
-        '--val_set uk/orchards/aut22/extracted'
+        #'--val_set GEORGIA-FR/husky/orchards/10nov23/00/submaps',
+        #'--val_set uk/strawberry/june23/extracted',
+        #'--val_set greenhouse/e3/extracted', 
+        #'--val_set uk/orchards/aut22/extracted'
         
-        #'--val_set uk/orchards/sum22/extracted',
-        #'--val_set uk/orchards/june23/extracted' ,
+        '--val_set uk/orchards/sum22/extracted',
+        '--val_set uk/orchards/june23/extracted' ,
         #'--val_set uk/orchards/aut22/extracted',
         #'--val_set uk/strawberry/june23/extracted',
         #'--val_set greenhouse/e3/extracted', 

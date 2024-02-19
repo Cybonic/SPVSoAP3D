@@ -146,24 +146,29 @@ class Trainer(BaseTrainer):
             # Accumulate error
             epoch_loss += batch_data.detach().cpu().item()
 
-            tbar.set_description('T ({}) | Loss {:.10f}'.format(epoch,epoch_loss/(batch_idx+1)))
+            bar_str = 'T ({}) | Loss {:.10f}'.format(epoch,epoch_loss/(batch_idx+1))
+            
+            
+            tbar.set_description(bar_str)
             tbar.update()
 
             if batch_idx % batch_size == 0 and batch_idx > 0:
+                
+                # Monitor the gradient norm
+                param = {'params': filter(lambda p:p.requires_grad, self.model.parameters())}
+                for layer in param['params']:
+                    if layer.grad is None:
+                        continue
+                    norm_grad = layer.grad.norm()
+                    batch_norm.append(norm_grad.detach().cpu().numpy().item())
+            
                 # Update model every batch_size iteration
                 self.mean_grad(batch_size)
                 self.optimizer.step()
                 self.optimizer.zero_grad()
                 #torch.cuda.empty_cache()
                 
-        # Monitor the gradient norm
-        param = {'params': filter(lambda p:p.requires_grad, self.model.parameters())}
-        for layer in param['params']:
-            if layer.grad is None:
-                continue
-            norm_grad = layer.grad.norm()
-            batch_norm.append(norm_grad.detach().cpu().numpy().item())
-
+        self.logger.info(bar_str)
         # Update the model after the last batch
         epoch_perfm = {}
         for key,value in epoch_loss_list.items():
