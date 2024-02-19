@@ -8,6 +8,7 @@ saved_model_data
 temp/
 predictions/
 results/
+logs/
 *.gif
 data/*
 *.torch

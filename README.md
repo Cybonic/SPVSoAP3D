@@ -1,3 +1,25 @@
+## Install NVIDIA Drivers 
+ubuntu-drivers devices
+
+### Clean/remove installed version
+
+https://askubuntu.com/questions/206283/how-can-i-uninstall-a-nvidia-driver-completely
+
+sudo apt-get remove --purge '^nvidia-.*'
+sudo reboot
+
+sudo dpkg -P $(dpkg -l | grep nvidia-driver | awk '{print $2}')
+sudo apt autoremove
+
+### INSTALL NVIDIA DRIVER
+#### on Ubuntu 20.04 
+
+sudo apt install nvidia-driver-530 -> Worked 
+
+
+
+######################################################33
+After installing the above driver, conda environments;
 
 
 ## Set up environment
@@ -18,6 +40,7 @@ conda create -n pr_env python=3.9.4
 conda activate pr_env
 ```
 ## Install Conda 11.7.0
+
 ```
 conda install -c "nvidia/label/cuda-11.7.0" cuda-toolkit -> Ubuntu 22.04
 conda install -c "nvidia/label/cuda-11.4.0" cuda-toolkit -> ubuntu 20.02 drivers 450.80.02
@@ -30,6 +53,7 @@ import torch
 python -c "import torch; print(torch.cuda.is_available()))
 ```
 ## Install sparse
+Both Cuda11.7 and cuda.11
 ```
 pip install --upgrade git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0
 ```
