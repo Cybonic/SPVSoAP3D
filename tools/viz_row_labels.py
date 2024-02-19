@@ -42,7 +42,6 @@ def generate_labels(seq,poses):
 
 def viz_overlap(xy, loops, record_gif= False, file_name = 'anchor_positive_pair.gif',frame_jumps=50):
 
-    
 
     mplot = myplot(delay=0.2)
     mplot.init_plot(xy[:,0],xy[:,1],s = 10, c = 'whitesmoke')
@@ -95,7 +94,7 @@ def viz_overlap(xy, loops, record_gif= False, file_name = 'anchor_positive_pair.
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='Play back images from a given directory')
-    parser.add_argument('--root', type=str, default='/home/deep/workspace/DATASET')
+    parser.add_argument('--root', type=str, default='/home/tiago/workspace/DATASET')
     parser.add_argument('--dynamic',default  = 1 ,type = int)
     parser.add_argument('--dataset',
                                     default = 'uk',
@@ -103,12 +102,12 @@ if __name__ == "__main__":
                                     help='dataset root directory.'
                                     )
     
-    parser.add_argument('--seq',default  = "strawberry/june23/extracted",type = str)
+    parser.add_argument('--seq',default  = "orchards/june23/extracted",type = str)
     parser.add_argument('--show',default  = True ,type = bool)
     parser.add_argument('--pose_data_source',default  = "positions" ,type = str, choices = ['gps','poses'])
     parser.add_argument('--debug_mode',default  = False ,type = bool, 
                         help='debug mode, when turned on the files saved in a temp directory')
-    parser.add_argument('--save_data',default  = True ,type = bool,
+    parser.add_argument('--save_data',default  = False ,type = bool,
                         help='save evaluation data to a pickle file')
     parser.add_argument('--load_labels',default  = False ,type = bool,
                         help='load labels from a pickle file')
@@ -196,9 +195,17 @@ if __name__ == "__main__":
         #color pallet based on the number of unique labels
         #color_pallet = np.array(['y','b','g','r','c','m','k','w'])
         color_pallet = np.array(['yellow','blue','green','red','cyan','magenta','pink','peru'])
-        color_pallet = np.array([ mcolors.CSS4_COLORS[v] for v in color_pallet])
+        colors = np.linspace(0, 1, 8)[::-1]
+        #color_pallet = np.array([ mcolors.CSS4_COLORS[v] for v in color_pallet])
+        # colors with  color=plt.cm.viridis(i / 5.0)
+        color_pallet = np.array([plt.cm.tab20c(colors[i]) for i in range(0,unique_labels.shape[0])])
         color = color_pallet[labels]
-
+        
+        # print color hex and label
+        for i in range(0,colors.shape[0]):
+            hex_code = mcolors.to_hex(np.array([plt.cm.viridis(colors[i])]))
+            print(hex_code,i)
+        
         point_color = np.array([color_pallet[labels[ii]] for ii in range(0,n_points)])
         # Plot the data
         fig = plt.figure()
@@ -208,6 +215,7 @@ if __name__ == "__main__":
         plt.savefig(os.path.join(save_root_dir,'point_row_labels.png'))
         plt.savefig('point_row_labels.png')
         print("[INF] Saved figure to: %s"% os.path.join(save_root_dir,'point_row_labels.png'))
+        print("[INF] Saved figure to: %s"% 'point_row_labels.png')
         plt.show()
 
 
