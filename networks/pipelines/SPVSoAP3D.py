@@ -48,10 +48,6 @@ class SPCov3Dx(nn.Module):
 class SPVSoAP3D(nn.Module):
     def __init__(self, output_dim=256,
                  local_feat_dim=16,
-                 do_fc =True,
-                 do_epn =True,
-                 do_pn = True,
-                 do_log = False,
                  pres=1,
                  vres=1,
                  cr=0.64,
@@ -60,10 +56,7 @@ class SPVSoAP3D(nn.Module):
 
         self.backbone = spvcnn(output_dim=local_feat_dim,pres=pres,vres=vres,cr=cr)
         
-        self.head = SoAP(do_fc = do_fc, 
-                        do_epn  = do_epn, 
-                        do_log = do_log,
-                        do_pn = do_pn,
+        self.head = SoAP(
                         input_dim=local_feat_dim,
                         output_dim=output_dim,
                         **kwargs)

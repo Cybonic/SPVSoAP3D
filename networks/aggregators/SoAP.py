@@ -46,14 +46,15 @@ def is_positive_definite_direct(matrix):
     
 class SoAP(nn.Module):
     def __init__(self, 
-                 p=0.75,
                  epsilon=1e-12, 
-                 do_fc=True, 
-                 do_log=True, 
-                 do_pn = True,
+                 do_fc  = True, 
+                 do_log = True, 
+                 do_pn  = True,
+                 do_pnl = True,
                  do_epn = True,
-                 input_dim=16, 
-                 output_dim=256,
+                 input_dim  = 16, 
+                 output_dim = 256,
+                 pn_value   = 0.5,
                  **kwargs):
         super(SoAP, self).__init__()
         
@@ -61,17 +62,22 @@ class SoAP(nn.Module):
         self.do_log = do_log
         self.do_epn = do_epn
         self.do_pn = do_pn
+        self.do_pnl = do_pnl
         # power norm over  eigen-value power normalization
         self.do_epn = False if do_pn else self.do_epn
         
         self.input_dim = input_dim
         self.epsilon = epsilon
         self.fc = nn.LazyLinear( output_dim)
-        self.p = nn.Parameter(torch.ones(1) * p)
+        if do_pnl:
+            self.p = nn.Parameter(torch.ones(1) * pn_value)
+        else:
+            self.p = pn_value
+        
     
     def __str__(self):
         
-        pn_str = "pn" 
+        pn_str = "pn:{:.2f}".format(self.p)  if not self.do_pnl else "pnl" 
         if self.do_epn and not self.do_pn:
             pn_str = "epn"
         elif not self.do_epn and not self.do_pn:
@@ -88,10 +94,11 @@ class SoAP(nn.Module):
         """
         Eigen-value Power Normalization over the positive semi-definite matrix.
         """
+        x = x.double()
         u_, s_, v_ = torch.svd(x)
         s_alpha = torch.pow(s_, 0.5)
-        x =torch.matmul(torch.matmul(u_, torch.diag_embed(s_alpha)), v_.transpose(-2, -1))
-        return x.float()
+        x =torch.matmul(torch.matmul(u_, torch.diag_embed(s_alpha)), v_.transpose(2, 1))
+        return x#.float()
   
             
     def _log(self,x):
@@ -101,22 +108,26 @@ class SoAP(nn.Module):
         # x must be a symmetric positive definite (SPD) matrix
         # assert is_batch_symmetric(x) # and is_positive_definite_direct(x)
         x = x.double()
+        #x = x + torchself.epsilon
         u, s, v = torch.linalg.svd(x)
-        s = s.clamp(min=self.epsilon)  # clamp to avoid log(0)
+        #s = s.clamp(min=self.epsilon)  # clamp to avoid log(0)
         x=torch.matmul(torch.matmul(u, torch.diag_embed(torch.log(s))), v)
-        x = x.clamp(min=self.epsilon)
+        #x = x.clamp(min=self.epsilon)
             
-        return x.float()
+        return x
 
     def _pow_norm(self,x):
         # Power Normalization.
         # Semantic Segmentation with Second-Order Pooling
         #h=0.75 
-        self.p.clamp(min=self.epsilon, max=1.0)
-        x = torch.sign(x)*torch.pow(torch.abs(x),self.p)
-        x = x.clamp(min=self.epsilon)
+        #self.p = torch.clamp(self.p, min=self.epsilon, max=1.0)
+        if self.do_pnl:
+            self.p.clamp(min=self.epsilon, max=1.0)
             
-        return x.float()
+        x = torch.sign(x)*torch.pow(torch.abs(x),self.p)
+        #x = x.clamp(min=self.epsilon)
+            
+        return x#.float()
     
     
     def forward(self, x):
