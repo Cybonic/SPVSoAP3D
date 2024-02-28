@@ -352,7 +352,7 @@ if __name__ == '__main__':
             config = SESSION,
             device = FLAGS.device,
             run_name = run_name,
-            train_epoch_zero = False,
+            train_epoch_zero = True,
             monitor_range = SESSION['monitor_range'],
             window_roi    = FLAGS.eval_roi_window,
             eval_protocol = 'place',
