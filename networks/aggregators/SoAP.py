@@ -54,7 +54,7 @@ class SoAP(nn.Module):
                  do_epn = True,
                  input_dim  = 16, 
                  output_dim = 256,
-                 pn_value   = 0.5,
+                 pn_value   = 0.75,
                  **kwargs):
         super(SoAP, self).__init__()
         
@@ -80,7 +80,7 @@ class SoAP(nn.Module):
         pn_str = "pn:{:.2f}".format(self.p)  if not self.do_pnl else "pnl" 
         if self.do_epn and not self.do_pn:
             pn_str = "epn"
-        elif not self.do_epn and not self.do_pn:
+        elif not self.do_epn and (not self.do_pn and not self.do_pnl):
             pn_str = "no_pn"
         
         stack = ["SoAP" ,
@@ -145,7 +145,7 @@ class SoAP(nn.Module):
         if self.do_log:
             x = self._log(x)
             
-        if self.do_pn:
+        if self.do_pn or self.do_pnl:
             x = self._pow_norm(x)
         
         if self.do_epn:
