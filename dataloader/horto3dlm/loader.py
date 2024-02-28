@@ -1,7 +1,7 @@
 
 
-from dataloader.kitti.kitti_eval import KITTIEval
-from dataloader.kitti.kitti_triplet import KittiTriplet
+from dataloader.horto3dlm.eval import Eval
+from dataloader.horto3dlm.triplet import Triplet
 from torch.utils.data import DataLoader,SubsetRandomSampler
 from dataloader.batch_utils import CollationFunctionFactory
 import numpy as np
@@ -35,7 +35,7 @@ class cross_validation():
         elif "sparse"in str(self.modality).lower():
             self.collation_fn = CollationFunctionFactory("sparse_tuple",voxel_size = 0.05, num_points=10000)
 
-        train_loader = KittiTriplet(root       = self.root,
+        train_loader = Triplet(root       = self.root,
                                     dataset     = self.dataset,
                                     sequences   = sequence,
                                     triplet_file = triplet_files,
@@ -89,7 +89,7 @@ class cross_validation():
         elif "sparse" in str(self.modality).lower() :
             self.collation_fn = CollationFunctionFactory("sparse",voxel_size = 0.05, num_points=10000)
 
-        val_loader = KITTIEval( root = self.root,
+        val_loader = Eval( root = self.root,
                                 dataset = self.dataset,
                                 sequence = sequence[0],
                                 modality = self.modality,

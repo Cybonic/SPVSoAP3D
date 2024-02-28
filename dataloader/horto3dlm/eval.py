@@ -4,7 +4,6 @@ from tqdm import tqdm
 import torchvision.transforms as Tr
 from dataloader.utils import extract_points_in_rectangle_roi
 from dataloader.utils import rotate_poses
-from dataloader import row_segments
 
 import numpy as np
 
@@ -13,14 +12,14 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 # Get the parent directory and add it to the Python path
 sys.path.append(os.path.abspath(os.path.join(current_dir, '..')))
 
-from dataloader.kitti.kitti_dataset import kittidataset
+from dataloader.horto3dlm.dataset import file_structure
 
 import pickle
 
 PREPROCESSING = Tr.Compose([Tr.ToTensor()])
 
 
-class KITTIEval:
+class Eval:
     def __init__(self,  root, 
                         dataset,
                         sequence, 
@@ -40,7 +39,7 @@ class KITTIEval:
         #self.num_samples = self.num_samples
         self.sequence = sequence
         self.device   = device
-        kitti_struct = kittidataset(root,dataset, sequence)
+        kitti_struct = file_structure(root,dataset, sequence)
             
         self.files,name = kitti_struct._get_point_cloud_file_()
         self.poses = kitti_struct._get_pose_()
@@ -70,6 +69,7 @@ class KITTIEval:
         print(f'Number of anchors: {len(self.anchors)}')
         print(f'Number of positives: {len(self.positives)}')
         print("\n" + "*"*30)
+        
         # Load dataset and laser settings
         self.poses = np.array(self.poses)
         self.num_samples = len(self.files)

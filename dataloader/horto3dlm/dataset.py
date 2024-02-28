@@ -90,7 +90,7 @@ def load_positions(file):
     return poses
 
 
-class kittidataset():
+class file_structure():
     
     def __init__(self,root,dataset,sequence,position_file="positions",verbose=False):
         # assert isinstance(sequences,list)

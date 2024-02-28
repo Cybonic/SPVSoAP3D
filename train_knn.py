@@ -42,7 +42,7 @@ if __name__ == '__main__':
         '--network', '-m',
         type=str,
         required=False,
-        default='SPVSoAP3D',#'LOGG3D', #SPCov3D
+        default='SPVSoAP3D',
         help='Directory to get the trained model.'
     )
 
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         '--device',
         type=str,
         required=False,
-        default='cuda',
+        default='cpu',
         help='Directory to get the trained model.'
     )
     parser.add_argument(
