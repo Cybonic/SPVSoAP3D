@@ -295,6 +295,8 @@ class BaseTrainer:
 
     def _resume_checkpoint(self, resume_path,**argv):
         self.logger.info(f'Loading checkpoint : {resume_path}')
+        assert os.path.isfile(resume_path), f"Checkpoint file not found {resume_path}"
+        
         checkpoint = torch.load(resume_path,map_location=torch.device(self.device))
         #self.start_epoch = checkpoint['epoch'] + 1
         try:
