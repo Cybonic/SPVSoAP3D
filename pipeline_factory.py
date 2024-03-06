@@ -96,9 +96,14 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
 # ======================================== DATALOADER FACTORY ======================================
 # ==================================================================================================
 
-def dataloader_handler(root_dir,network,dataset,session,pcl_norm=False,**args):
+def dataloader_handler(root_dir,network,dataset,val_set,session,pcl_norm=False,**args):
 
-
+    # Load the predefined data splits 
+    datasplits = yaml.load(open("sessions/data_splits.yaml", 'r'),Loader=yaml.FullLoader)
+    # Get the training and validation sequences based on VAL_SET
+    session['train_loader']['sequence'] = datasplits['cross_validation'][val_set] # Get the training sequences for val_set
+    session['val_loader']['sequence']   = [val_set]
+    
     sensor_pram = yaml.load(open("dataloader/sensor-cfg.yaml", 'r'),Loader=yaml.FullLoader)
 
     roi = None
@@ -135,7 +140,7 @@ def dataloader_handler(root_dir,network,dataset,session,pcl_norm=False,**args):
     else:
         raise NotImplementedError("Modality not implemented!")
 
-    dataset = dataset.lower()
+    #dataset = dataset.lower()
 
     # Select experiment type by default is cross_validation
     model_evaluation = "cross_validation" # Default
