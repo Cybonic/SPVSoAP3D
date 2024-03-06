@@ -11,7 +11,8 @@
 
 '''
 
-Scancontext requires Batch size of 1
+Version: 3.1 
+ - pretrained model is automatically loaded based on the model and session names 
  
 '''
 import argparse
