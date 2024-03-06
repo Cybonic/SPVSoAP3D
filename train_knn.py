@@ -25,9 +25,6 @@ from trainer import Trainer
 from pipeline_factory import model_handler,dataloader_handler
 import numpy as np
 
-
-#if torch.cuda.is_available():
-#  os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
   
 def force_cudnn_initialization():
     s = 32
@@ -67,7 +64,7 @@ if __name__ == '__main__':
         type=str,
         #choices=['none', 'best_model'],
         required=False,
-        default='none',
+        default='/home/tiago/workspace/SPCoV/checkpoints/iros24_published/sj23-spvsoap3d.pth',
         help='Directory to get the trained model.'
     )
 
@@ -91,8 +88,14 @@ if __name__ == '__main__':
         '--dataset',
         type=str,
         required=False,
-        default='greenhouse', # uk
+        default='HORT-3DLM', # uk
         help='Directory to get the trained model.'
+    )
+    parser.add_argument(
+        '--val_set',
+        type=str,
+        required=False,
+        default = 'ON23',
     )
     parser.add_argument(
         '--device',
@@ -183,12 +186,7 @@ if __name__ == '__main__':
         default = True,
         help='sampling points.'
     )
-    parser.add_argument(
-        '--val_set',
-        type=str,
-        required=False,
-        default = 'uk/orchards/sum22/extracted',
-    )
+    
 
     parser.add_argument(
         '--roi',
@@ -248,18 +246,12 @@ if __name__ == '__main__':
     SESSION['pcl_norm'] = FLAGS.pcl_norm
     # Update config file with new settings
     SESSION['experiment'] = FLAGS.experiment
-    SESSION['modelwrapper']['minibatch_size']  = FLAGS.mini_batch_size
-    SESSION['modelwrapper']['feat_dim']  = FLAGS.feat_dim
+    SESSION['trainer']['minibatch_size']  = FLAGS.mini_batch_size
+    SESSION['trainer']['feat_dim']  = FLAGS.feat_dim
     SESSION['aug']  = FLAGS.augmentation
     # Define evaluation mode: cross_validation or split
     SESSION['model_evaluation'] = FLAGS.model_evaluation
     
-    if SESSION['model_evaluation'] == "cross_validation":
-        SESSION['train_loader']['sequence'] = SESSION['cross_validation'][FLAGS.val_set]
-        SESSION['val_loader']['sequence']   = [FLAGS.val_set]
-    elif SESSION['model_evaluation'] == "split":
-        SESSION['train_loader']['sequence'] = [FLAGS.val_set]
-        SESSION['val_loader']['sequence']   = [FLAGS.val_set]
    
     SESSION['val_loader']['batch_size'] = FLAGS.eval_batch_size
     SESSION['train_loader']['triplet_file'] = FLAGS.triplet_file
@@ -287,11 +279,11 @@ if __name__ == '__main__':
     print("Triplet Data File: " + str(FLAGS.triplet_file))
     print("Augmentation: " + str(SESSION['train_loader']['augmentation']))
     print("Batch Size : ", str(SESSION['train_loader']['batch_size']))
-    print("MiniBatch Size: ", str(SESSION['modelwrapper']['minibatch_size']))
+    print("MiniBatch Size: ", str(SESSION['trainer']['minibatch_size']))
     
     print("\n======= VAL LOADER =======")
     #print("Dataset  : ", SESSION['val_loader']['dataset'])
-    print("Sequence : ", SESSION['val_loader']['sequence'])
+    #print("Sequence : ", SESSION['val_loader']['sequence'])
     print("Batch Size : ", str(SESSION['val_loader']['batch_size']))
     print("Max Points: " + str(SESSION['max_points']))
     print("Eval Data File: " + str(FLAGS.eval_file))
@@ -303,7 +295,7 @@ if __name__ == '__main__':
     print("Backbone : ", FLAGS.network)
     print("Resume: ",  FLAGS.resume )
     print("Loss: ",FLAGS.loss)
-    print("MiniBatch Size: ", str(SESSION['modelwrapper']['minibatch_size']))
+    print("MiniBatch Size: ", str(SESSION['trainer']['minibatch_size']))
     
     
     print("\n==========================")
@@ -334,19 +326,14 @@ if __name__ == '__main__':
                             feat_dim  =FLAGS.feat_dim,
                             device    =FLAGS.device,
                             loss = SESSION['loss'],
-                            modelwrapper = SESSION['modelwrapper']
+                            trainer = SESSION['trainer']
                             )
 
     
-    #device_name = os.uname()[1]
-    #pc_config = yaml.safe_load(open("sessions/pc_config.yaml", 'r'))
-    
-    root_dir = FLAGS.dataset_root #pc_config[device_name]
-    
-    
-    loader = dataloader_handler(root_dir,
+    loader = dataloader_handler(FLAGS.dataset_root,
                                 FLAGS.network,
                                 FLAGS.dataset,
+                                FLAGS.val_set,
                                 SESSION,
                                 roi = FLAGS.roi,
                                 pcl_norm = FLAGS.pcl_norm)
