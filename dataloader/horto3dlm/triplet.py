@@ -20,12 +20,16 @@ class Triplet():
                  memory = 'DISK',
                  device = 'cpu',
                  augmentation = False,
-                 shuffle_points = False
+                 shuffle_points = False,
+                 **argv
                     ):
         
-        assert modality != None, "Modality does not be None"
+        assert modality != None, "Modality can't be None"
+        
+        self.verbose = argv['verbose'] if 'verbose' in argv else True
+        
         self.modality = modality 
-        self.augmentation = bool(augmentation)
+        self.augmentation   = bool(augmentation)
         self.shuffle_points = bool(shuffle_points)
         
         self.evaluation_mode = False
@@ -40,11 +44,12 @@ class Triplet():
         self.device     = device
         baseline_idx    = 0 
         self.memory = memory 
-        
+        info_buffer = []
         assert self.memory in ["RAM","DISK"]
         #self.ground_truth_mode = argv['ground_truth']
         assert isinstance(sequences,list)
         for seq in sequences:
+            
             kitti_struct = file_structure(root, dataset, seq)
             
             files,name = kitti_struct._get_point_cloud_file_()
@@ -57,7 +62,7 @@ class Triplet():
             self.poses.extend(pose)
 
             #triplet_path = os.path.join(root,dataset,seq,triplet_file)
-            triplet_path = os.path.join(root,seq,triplet_file)
+            triplet_path = os.path.join(root,dataset,seq,triplet_file)
             assert os.path.isfile(triplet_path), "Triplet file does not exist " + triplet_path
             
              # load the numpy arrays from the file using pickle
@@ -67,15 +72,34 @@ class Triplet():
                 seq_positives = data['positives']
                 seq_negatives = data['negatives']
             
-            print("Sequence: %s" % seq)
-            print("Anchors: %s" % len(seq_anchors))
+            
+            
             for a,p,n in zip(seq_anchors,seq_positives,seq_negatives):
                 self.anchors.extend([baseline_idx + a.item()])
                 self.positives.extend([baseline_idx + p])
                 self.negatives.extend([baseline_idx + n])
 
             baseline_idx += len(files)
+            
+            info_buffer.append([seq,seq_anchors])
 
+        
+        ## Display sequence information in table format
+        if self.verbose:
+            print("\n*** Trining DATA Information\n")
+            print("\nSequence Information")
+            print("Sequence | Anchors")
+            print("-" * 20)
+            total_anchors = 0
+            for info in info_buffer:
+                sequence = info[0]
+                anchors = len(info[1])
+                total_anchors += anchors
+                print("{:<8} | {:<7}".format(sequence, anchors))
+            print("-" * 20)
+            print("{:<8} | {:<7}".format('Total', total_anchors))
+            
+        
         # Load dataset and laser settings
         self.anchors = np.array(self.anchors)
         self.poses = np.array(self.poses)
