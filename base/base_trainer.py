@@ -7,6 +7,7 @@ from utils import logger
 #import utils.lr_scheduler
 import torch.optim.lr_scheduler as lr_scheduler
 import GPUtil
+import yaml
 
 
 def get_instance(module, name, config, *args):
@@ -79,8 +80,10 @@ class BaseTrainer:
         self.optimizer = get_instance(torch.optim, 'optimizer', config, trainable_params)
         
         # SHEDULER
+        training_pram = yaml.load(open("sessions/training_pram.yaml", 'r'),Loader=yaml.FullLoader)
         sheduler_type = config['optimizer']['lr_scheduler']
-        args = config[sheduler_type]
+        
+        args = training_pram[sheduler_type]
         self.lr_scheduler = getattr(lr_scheduler,sheduler_type)(optimizer=self.optimizer,**args) 
 
         # MONITORING
