@@ -54,7 +54,7 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
     elif pipeline_name == 'SPVSoAP3D':
         pipeline = SPVSoAP3D(output_dim=output_dim,
                            local_feat_dim=16,
-                           do_fc  = False,
+                           do_fc  = True,
                            do_epn = False,
                            do_log = True,
                            do_pn  = True,
