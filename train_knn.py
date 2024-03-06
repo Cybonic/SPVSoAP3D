@@ -39,6 +39,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser("./infer.py")
 
     parser.add_argument(
+        '--dataset_root',
+        type=str,
+        required=False,
+        default='/home/tiago/workspace/DATASET',
+        help='Directory to get the trained model.'
+    )
+    
+    parser.add_argument(
         '--network', '-m',
         type=str,
         required=False,
@@ -317,9 +325,7 @@ if __name__ == '__main__':
     # The development has been made on different PCs, each has some custom settings
     # e.g the root path to the dataset;
 
-    device_name = os.uname()[1]
-    pc_config = yaml.safe_load(open("sessions/pc_config.yaml", 'r'))
-    root_dir = pc_config[device_name]
+    
     
     # Build the model and the loader
     model_ = model_handler(FLAGS.network,
@@ -331,6 +337,12 @@ if __name__ == '__main__':
                             modelwrapper = SESSION['modelwrapper']
                             )
 
+    
+    #device_name = os.uname()[1]
+    #pc_config = yaml.safe_load(open("sessions/pc_config.yaml", 'r'))
+    
+    root_dir = FLAGS.dataset_root #pc_config[device_name]
+    
     
     loader = dataloader_handler(root_dir,
                                 FLAGS.network,
