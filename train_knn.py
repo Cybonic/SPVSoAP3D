@@ -57,7 +57,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--resume', '-r',
         type=str,
-        choices=['none', 'best_model'],
+        #choices=['none', 'best_model'],
         required=False,
         default='none',
         help='Directory to get the trained model.'
