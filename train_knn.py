@@ -39,7 +39,7 @@ if __name__ == '__main__':
         '--dataset_root',
         type=str,
         required=False,
-        default='/home/tiago/workspace/DATASET',
+        default='',
         help='Directory to get the trained model.'
     )
     
@@ -62,7 +62,6 @@ if __name__ == '__main__':
     parser.add_argument(
         '--resume', '-r',
         type=str,
-        #choices=['none', 'best_model'],
         required=False,
         default='/home/tiago/workspace/SPCoV/checkpoints/iros24_published/sj23-spvsoap3d.pth',
         help='Directory to get the trained model.'
@@ -242,7 +241,7 @@ if __name__ == '__main__':
     session_cfg_file = os.path.join('sessions', FLAGS.session + '.yaml')
     print("Opening session config file: %s" % session_cfg_file)
     SESSION = yaml.safe_load(open(session_cfg_file, 'r'))
-
+    
     SESSION['pcl_norm'] = FLAGS.pcl_norm
     # Update config file with new settings
     SESSION['experiment'] = FLAGS.experiment
@@ -311,13 +310,6 @@ if __name__ == '__main__':
     # For repeatability
     torch.manual_seed(0)
     np.random.seed(0)
-
-    # Get Loss parameters
-    ###################################################################### 
-    # The development has been made on different PCs, each has some custom settings
-    # e.g the root path to the dataset;
-
-    
     
     # Build the model and the loader
     model_ = model_handler(FLAGS.network,

@@ -5,36 +5,15 @@ import subprocess
 full_cap = '--epoch 20'
 args = [
         '--network SPVSoAP3D',
-        #'--network PointNetPCACov3DC',
-        #'--network PointNetVLAD',
-        #'--network LOGG3D',
-        #'--network SPCov3D',
-        #'--network PointNetMAC',
-        #'--network PointNetGeM',
-        #'--network overlap_transformer --modality bev',
-
-        #'--network PointNetORCHNet',
-        #'--network ResNet50ORCHNet --modality bev'
-        #'--network ResNet50ORCHNetMaxPooling --modality bev',
-        #'--network ResNet50GeM --modality bev',
-        #' --network overlap_transformer',
-        #f'--memory RAM  --modality bev  --session kitti --model VLAD_resnet50 ',
-        #f'--memory RAM  --modality bev  --session kitti --model SPoC_resnet50 ',
-        #f'--memory RAM  --modality bev  --session kitti --model GeM_resnet50 ',
-        #f'--memory RAM  --modality bev  --session kitti --model MuHA_resnet50',
 ]       
 
-#losses = ['PositiveLoss','LazyTripletLoss','LazyQuadrupletLoss']
-#losses = ['LazyTripletLoss','LazyQuadrupletLoss']
 losses = ['LazyTripletLoss']
 
 density = ['10000']
 
 evaluation_type = "cross_validation"
-experiment      = f'-e iros24_ablation/{evaluation_type}-nonorm-10m-aug-noroi'
+experiment      = f'-e iros24/{evaluation_type}'
 input_preprocessing = ' --roi 0 --augmentation 1 --shuffle_points 1 --pcl_norm 0'
-
-#resume  = '--resume best_model'
 
 
 chk_dir = '~/workspace/SPCoV/checkpoints/iros24_published/sj23-spvsoap3d.pth'

@@ -3,9 +3,8 @@ from cmath import nan
 from base.base_trainer import BaseTrainer
 from tqdm import tqdm  
 import numpy as np
-from eval_knn import PlaceRecognition
-import logging
-import torch
+from place_recognition import PlaceRecognition
+
 # ===================================================================================================================
 #       
 #
