@@ -62,7 +62,7 @@ class Triplet():
             self.poses.extend(pose)
 
             #triplet_path = os.path.join(root,dataset,seq,triplet_file)
-            triplet_path = os.path.join(root,dataset,seq,triplet_file)
+            triplet_path = os.path.join(kitti_struct.target_dir,triplet_file)
             assert os.path.isfile(triplet_path), "Triplet file does not exist " + triplet_path
             
              # load the numpy arrays from the file using pickle

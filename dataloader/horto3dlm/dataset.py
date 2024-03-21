@@ -99,7 +99,7 @@ class file_structure():
         self.target_dir = []
 
         #self.target_dir = os.path.join(root,dataset,sequence)
-        self.target_dir = os.path.join(root,dataset,sequence)
+        self.target_dir = os.path.join(root,dataset,sequence,'extracted')
         assert os.path.isdir(self.target_dir),'target dataset does not exist: ' + self.target_dir
 
         # Get pose file
