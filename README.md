@@ -43,9 +43,29 @@ pip install -r requirements.txt
 
 
 
-### Checkpoints
-Download the checkpoints (iros24_spvsoap_checkpoints.zip) of SPVSPoAP for all sequences 
-[HERE](https://nas-greenbotics.isr.uc.pt/drive/d/s/xir9GqHeapy6NaySdwYtRS5wxyZFqihw/Dpf0XQOI5qKW1sHq5NQJw2G_LPwbCucP-ErMAYYFOOAs)
+### Checkpoints 
+The checkpoints can be downloaded from  [SPVSoAP3D_iros24.zip](https://nas-greenbotics.isr.uc.pt/drive/d/s/xkN8AYuu7uiP9n4kp2Am1fUNFxE2dLaa/bRgEMDjkuiBPCYZb9qKxFg7_3cZ50SXd-DLkgwc17OQs).
+
+SPVSoAP3D_iros24.zip contains additionally the descriptors and results obtained with SPVSoAP3D on all sequences. SPVSoAP3D_iros24.zip has the following strucutre:
+```
+24SPVSoAP3D_iros24.zip
+├── GT23 
+├── OJ22
+├── OJ23
+├── ON22
+├── ON23
+└── SJ23
+    ├── checkpoints.pth # trained weights
+    ├── descriptors.torch # descriptors
+    └── place
+        ├── results_precision.csv # precision 
+        ├── results_recall.csv # recall 
+        ├── loops.csv # predicted loops
+        ├── scores.csv # similarity scores  
+        └── target.csv # ground-truth loops
+```
+
+
 
 The compressed file iros24_spvsoap_checkpoints.zip contains the following checkpoint files: 
 
