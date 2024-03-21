@@ -6,11 +6,14 @@ import os
 chkpt_root = '/home/tiago/workspace/SPCoV/predictions/iros24/' # Path to the checkpoints or descriptors
 # Define the path to the dataset
 dataset_root = '/home/tiago/DATASETS_TO_NAS'
+
+resume     = "checkpoints.pth" # choise [checkpoints.pth, descriptors.torch]
+
 # Path to save the predictions
 save_path  = 'predictions/iros24'
 # Define the experiment name 
 experiment = 'cross_validation'
-resume     = "checkpoints.pth" # choise [checkpoints.pth, descriptors.torch]
+
 model      = "SPVSoAP3D"
   
 test_sequences = ['GTJ23','OJ22','OJ23','ON22','ON23','SJ23']
