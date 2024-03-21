@@ -139,19 +139,18 @@ class PlaceRecognition():
 
 
 
-    def load_descriptors(self,root_dir=None):
+    def load_descriptors(self,file=None):
         """
         Load descriptors from a file
         params:
             file (string): file name to load the descriptors
         return: None
         """
-        target_dir = os.path.join(self.predictions_dir)
-        if root_dir != None:
-            target_dir = os.path.join(root_dir,self.predictions_dir)
-        #target_dir = os.path.join(self.predictions_dir,file)
-        
-        file = search_files_in_dir(target_dir,'descriptors')[0]
+        #target_dir = os.path.join(self.predictions_dir)
+        if file == None:
+            target_dir = self.predictions_dir
+            #target_dir = os.path.join(self.predictions_dir,file)
+            file = search_files_in_dir(target_dir,'descriptors')[0]
         
         if not os.path.isfile(file): 
             self.logger.error("\n ** File does not exist: "+ file)
