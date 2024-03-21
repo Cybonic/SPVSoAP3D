@@ -68,7 +68,7 @@ SPVSoAP3D_iros24.zip contains additionally the descriptors and results obtained 
 ```
 For more details on the xxx.csv files, please read READ-ME.md file in the 24SPVSoAP3D_iros24.zip.
 
-# Run Model
+### Run all over all sequnces once
 
 Run all sequences, in the script_eval.py file: change the path accordingly
 
@@ -85,4 +85,19 @@ resume  = "checkpoints.pth" # <-- choise [checkpoints.pth, descriptors.torch]
 Then run the file
 ```
 python script_eval.py  # runs all sequences 
+```
+
+
+### Run each sequence 
+
+```
+python eval_knn.py 
+    --val_set <seq>
+    --network <model>, # Network
+    --resume <chkpt_root>/<model>/<seq>/<resume>
+    --memory <DISK>  # [DISK, RAM] 
+    --device cuda', # Device
+    --save_predictions  <path/to/save/predictions> # Save predictions
+    -e <experiment name>
+    --roi 0 --augmentation 0 --pcl_norm 0 # Preprocessing
 ```
