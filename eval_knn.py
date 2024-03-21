@@ -29,6 +29,10 @@ def force_cudnn_initialization():
     dev = torch.device('cuda')
     torch.nn.functional.conv2d(torch.zeros(s, s, s, s, device=dev), torch.zeros(s, s, s, s, device=dev))
 
+# On terminal run the following command to set the environment variable
+# export CUBLAS_WORKSPACE_CONFIG=":4096:8"
+
+#torch.use_deterministic_algorithms(True)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("./infer.py")
@@ -70,7 +74,7 @@ if __name__ == '__main__':
         '--device',
         type=str,
         required=False,
-        default='cpu',
+        default='cuda',
         help='Directory to get the trained model.'
     )
     parser.add_argument(
@@ -165,10 +169,10 @@ if __name__ == '__main__':
         '--resume', '-r',
         type=str,
         required=False,
-        default='/home/tiago/workspace/SPCoV/checkpoints/iros24_spvsoap_checkpoints/gtj23-spvsoap3d.pth',
+        default='/home/tiago/workspace/SPCoV/predictions',
         help='Directory to get the trained model.'
     )
-    
+
     parser.add_argument(
         '--session',
         type=str,
@@ -257,6 +261,7 @@ if __name__ == '__main__':
     print("----------\n")
 
     # For repeatability
+    
     torch.manual_seed(0)
     np.random.seed(0)
 
@@ -294,7 +299,7 @@ if __name__ == '__main__':
             model        = model,
             train_loader = None,#loader.get_train_loader(),
             val_loader   = loader.get_val_loader(),
-            resume       = FLAGS.resume,
+            resume       = None,
             config       = SESSION,
             device       = FLAGS.device,
             run_name     = run_name,
@@ -307,10 +312,13 @@ if __name__ == '__main__':
     
     loop_range = list(range(0,120,1))
     
-    best_model_filename = FLAGS.resume 
-    # Generate descriptors, predictions and performance for the best weights
-    #print(f'\nLoading best model: {best_model_filename}\n')
-    #trainer.eval_approach.load_pretrained_model(best_model_filename)
+    assert os.path.exists(FLAGS.resume ), "File not found %s"%FLAGS.resume 
+        
+    if FLAGS.resume.split('/')[-1] == 'checkpoints.pth':
+        trainer.eval_approach.load_pretrained_model(FLAGS.resume)
+        
+    if FLAGS.resume.split('/')[-1] == 'descriptors.torch':
+        trainer.eval_approach.load_descriptors(FLAGS.resume)
     
     trainer.eval_approach.run(loop_range=loop_range)
     
