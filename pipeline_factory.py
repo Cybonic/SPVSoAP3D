@@ -130,7 +130,7 @@ def dataloader_handler(root_dir,network,dataset,val_set,session,pcl_norm=False,*
     elif network in ['LOGG3D'] or network.startswith("SPV"):
         # Get sparse (voxelized) point cloud based modality
         num_points=session['max_points']
-        modality = SparseLaserScan(voxel_size=0.1,max_points=num_points, pcl_norm = pcl_norm)
+        modality = SparseLaserScan(voxel_size=0.1,max_points=num_points, pcl_norm = False)
     
     elif network in ['PointNetVLAD']:
         

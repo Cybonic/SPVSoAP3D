@@ -37,7 +37,7 @@ if __name__ == '__main__':
         '--dataset_root',
         type=str,
         required=False,
-        default='/home/tiago/workspace/DATASET',
+        default='/home/tiago/DATASETS_TO_NAS',
         help='Directory to get the trained model.'
     )
     
@@ -78,21 +78,6 @@ if __name__ == '__main__':
         type=int,
         required=False,
         default=10,
-        help='Directory to get the trained model.'
-    )
-    parser.add_argument(
-        '--mini_batch_size',
-        type=int,
-        required=False,
-        default=22000, #  Max size (based on the negatives)
-        help='Directory to get the trained model.'
-    )
-    parser.add_argument(
-        '--loss',
-        type=str,
-        required=False,
-        default = 'LazyTripletLoss',
-        choices=['LazyTripletLoss','LazyQuadrupletLoss','PositiveLoss'],
         help='Directory to get the trained model.'
     )
     parser.add_argument(
@@ -145,7 +130,7 @@ if __name__ == '__main__':
         '--dataset',
         type=str,
         required=False,
-        default='HORTO-3DLM', # uk
+        default='HORTO', # uk
         help='Directory to get the trained model.'
     )
     
@@ -236,7 +221,6 @@ if __name__ == '__main__':
         SESSION['trainer']['save_dir'] =  FLAGS.chkpt_root
     # Update config file with new settings
     SESSION['experiment'] = FLAGS.experiment
-    SESSION['trainer']['minibatch_size']  = FLAGS.mini_batch_size
     SESSION['trainer']['feat_dim']  = FLAGS.feat_dim
     
     # Define evaluation mode: cross_validation or split
@@ -248,7 +232,6 @@ if __name__ == '__main__':
     SESSION['val_loader']['augmentation'] = False
     
     SESSION['val_loader']['roi'] = FLAGS.roi
-    SESSION['loss']['type'] = FLAGS.loss
     SESSION['max_points'] = FLAGS.max_points
     SESSION['memory']     = FLAGS.memory
     SESSION['monitor_range'] = FLAGS.monitor_loop_range
@@ -265,13 +248,11 @@ if __name__ == '__main__':
     print("\n========== MODEL =========")
     print("Backbone : ", FLAGS.network)
     print("Resume: ",  FLAGS.resume )
-    print("Loss: ",FLAGS.loss)
     #print("MiniBatch Size: ", str(SESSION['modelwrapper']['minibatch_size']))
     print("\n==========================")
     print(f'Eval Protocal: {FLAGS.eval_protocol}')
     print(f'Memory: {FLAGS.memory}')
     print(f'Device: {FLAGS.device}')
-    print("Loss: %s" %(SESSION['loss']['type']))
     print("Experiment: %s" %(FLAGS.experiment))
     print("----------\n")
 
@@ -288,7 +269,6 @@ if __name__ == '__main__':
                             output_dim = 256,
                             feat_dim   = FLAGS.feat_dim,
                             device     = FLAGS.device,
-                            loss       = SESSION['loss'], # Loss is required to build the model name correctly (change this in the future)
                             trainer = SESSION['trainer']
                             )
 
@@ -305,7 +285,7 @@ if __name__ == '__main__':
                                 roi = FLAGS.roi, 
                                 pcl_norm = False)
 
-    run_name = {'dataset': '-'.join(str(SESSION['val_loader']['sequence'][0]).split('/')),
+    run_name = {'dataset': '-'.join(str(FLAGS.val_set).split('/')),
                 'experiment':os.path.join(FLAGS.experiment,FLAGS.triplet_file,str(FLAGS.max_points)), 
                 'model': str(model)
             }
@@ -321,7 +301,7 @@ if __name__ == '__main__':
             train_epoch_zero = False,
             monitor_range = FLAGS.monitor_loop_range,
             window_roi    = FLAGS.eval_roi_window,
-            eval_protocol='place',
+            eval_protocol = 'place',
             debug = False
             )
     
@@ -330,7 +310,7 @@ if __name__ == '__main__':
     best_model_filename = FLAGS.resume 
     # Generate descriptors, predictions and performance for the best weights
     #print(f'\nLoading best model: {best_model_filename}\n')
-    trainer.eval_approach.load_pretrained_model(best_model_filename)
+    #trainer.eval_approach.load_pretrained_model(best_model_filename)
     
     trainer.eval_approach.run(loop_range=loop_range)
     
