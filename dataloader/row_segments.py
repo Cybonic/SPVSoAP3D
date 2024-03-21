@@ -20,7 +20,7 @@ The row segments are defined as a dictionary with the following structure:
 
 """
 
-husky_orchards_10nov23_00 = {'angle':-112.5,  # GT ORCHARDS 10nov23_00
+ON23 = {'angle':-112.5,  # GT ORCHARDS 10nov23_00
         'rows':
             [ 
              #[ -55,-44,-1, 100],
@@ -61,7 +61,7 @@ orchards_sum22 = {'angle':87, # -3, # Angle to aline the rows with the image fra
  } 
 
 
-e3 = {'angle':88, # Angle to aline the rows with the image frame
+GTJ23 = {'angle':88, # Angle to aline the rows with the image frame
         'rows':
         [[-1,0.5,1,37],
          [1,3,1,37],
