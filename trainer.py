@@ -187,6 +187,7 @@ class Trainer(BaseTrainer):
 
     def _valid_epoch(self,epoch,loop_range = None):
 
+        self.model.eval()
         if loop_range is None or isinstance(loop_range,int):
             loop_range = [loop_range]
         

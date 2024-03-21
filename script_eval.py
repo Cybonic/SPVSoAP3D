@@ -3,26 +3,19 @@ import os
 
 
 # Define the path to the checkpoints
-chkpt_root = '/home/tiago/workspace/SPCoV/code/v3/checkpoints/iros24_ablation/cross_validation-nonorm-10m-aug-noroi/triplet/ground_truth_ar0.5m_nr10m_pr2m.pkl/10000/greenhouse-e3-extracted/SPVSoAP3D-SoAP-log-pn-fc-LazyTripletLoss_L2/best_model.pth'
-
-chkpt_root = '/home/tiago/workspace/SPCoV/checkpoints/iros24_spvsoap_checkpoints'
-save_path = '~/workspace/SPCoV/predictions'
-
-test_sequences = [
-        f'--val_set GTJ23  --resume {chkpt_root}/gtj23-spvsoap3d.pth',
-        f'--val_set OJ22   --resume {chkpt_root}/oj22-spvsoap3d.pth',
-        f'--val_set OJ23   --resume {chkpt_root}/oj23-spvsoap3d.pth',
-        f'--val_set ON22   --resume {chkpt_root}/on22-spvsoap3d.pth',
-        f'--val_set ON23   --resume {chkpt_root}/on23-spvsoap3d.pth',
-        f'--val_set SJ23   --resume {chkpt_root}/sj23-spvsoap3d.pth', 
-]
-
-experiment = 'iros24/cross_validation'
+chkpt_root = '/home/tiago/workspace/SPCoV/predictions/iros24/' # Path to the checkpoints or descriptors
+save_path  = 'predictions/iros24' # Path to save the predictions
+experiment = 'cross_validation'
+resume     = "checkpoints.pth" # choise [checkpoints.pth, descriptors.torch]
+model      = "SPVSoAP3D"
+  
+test_sequences = ['GTJ23','OJ22','OJ23','ON22','ON23','SJ23']
 
 for seq in test_sequences:
         func_arg = [ 
-                seq,
-                f'--network SPVSoAP3D', # Network
+                f'--val_set {seq}',
+                f'--network {model}', # Network
+                f'--resume {chkpt_root}/{model}/{seq}/{resume}'
                 '--memory DISK', # [DISK, RAM] 
                 '--device cuda', # Device
                 '--eval_roi_window 100', # Evaluation ROI window
