@@ -49,6 +49,7 @@ The checkpoints can be downloaded from  [SPVSoAP3D_iros24.zip](https://nas-green
 SPVSoAP3D_iros24.zip contains additionally the descriptors and results obtained with SPVSoAP3D on all sequences. SPVSoAP3D_iros24.zip has the following strucutre:
 ```
 24SPVSoAP3D_iros24.zip
+├── READ-ME.md # file explaining the meaning of each file 
 ├── GT23 
 ├── OJ22
 ├── OJ23
@@ -63,22 +64,6 @@ SPVSoAP3D_iros24.zip contains additionally the descriptors and results obtained 
         ├── loops.csv # predicted loops
         ├── scores.csv # similarity scores  
         └── target.csv # ground-truth loops
+
 ```
-
-
-
-The compressed file iros24_spvsoap_checkpoints.zip contains the following checkpoint files: 
-
-| file     | Sequence |
-|:--------:|:--------:|
-| gtj23-spvsoap3d.pth   | GTJ23  |
-| oj22-spvsoap3d.pth    | OJ22   |
-| oj23-spvsoap3d.pth    | OJ23   |
-| on22-spvsoap3d.pth    | ON22   |
-| on23-spvsoap3d.pth    | ON23   |
-| sj23-spvsoap3d.pth    | SJ23   |
-
-
-##  Inference 
-
-python 
+For more details on the xxx.csv files, please read READ-ME.md file in the 24SPVSoAP3D_iros24.zip.
