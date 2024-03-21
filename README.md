@@ -67,3 +67,22 @@ SPVSoAP3D_iros24.zip contains additionally the descriptors and results obtained 
 
 ```
 For more details on the xxx.csv files, please read READ-ME.md file in the 24SPVSoAP3D_iros24.zip.
+
+# Run Model
+
+Run all sequences, in the script_eval.py file: change the path accordingly
+
+script_eval.py:
+```
+chkpt_root = ' '  <--- path to the unziped 24SPVSoAP3D_iros24.zip  file
+
+dataset_root = ' ' <-- path to the dataset 
+
+# Select the option to run from checkpoints.pth or precomputed descriptors.torch 
+resume  = "checkpoints.pth" # <-- choise [checkpoints.pth, descriptors.torch]
+```
+
+Then run the file
+```
+python script_eval.py  # runs all sequences 
+```
