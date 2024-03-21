@@ -94,22 +94,22 @@ def viz_overlap(xy, loops, record_gif= False, file_name = 'anchor_positive_pair.
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='Play back images from a given directory')
-    parser.add_argument('--root', type=str, default='/home/tiago/workspace/DATASET')
+    parser.add_argument('--root', type=str, default='/home/tiago/DATASETS_TO_NAS')
     parser.add_argument('--dynamic',default  = 1 ,type = int)
     parser.add_argument('--dataset',
-                                    default = 'uk',
+                                    default = 'HORTO',
                                     type= str,
                                     help='dataset root directory.'
                                     )
     
-    parser.add_argument('--seq',default  = "orchards/june23/extracted",type = str)
+    parser.add_argument('--seq',default  = "GTJ23",type = str)
     parser.add_argument('--show',default  = True ,type = bool)
     parser.add_argument('--pose_data_source',default  = "positions" ,type = str, choices = ['gps','poses'])
-    parser.add_argument('--debug_mode',default  = False ,type = bool, 
+    parser.add_argument('--debug_mode',default  = True ,type = bool, 
                         help='debug mode, when turned on the files saved in a temp directory')
     parser.add_argument('--save_data',default  = False ,type = bool,
                         help='save evaluation data to a pickle file')
-    parser.add_argument('--load_labels',default  = False ,type = bool,
+    parser.add_argument('--load_labels',default  = True ,type = bool,
                         help='load labels from a pickle file')
     
 
@@ -129,19 +129,16 @@ if __name__ == "__main__":
     session_cfg_file = os.path.join('sessions',f'{dataset}.yaml')
     print("Opening session config file: %s" % session_cfg_file)
     
-    device_name = os.uname()[1]
-    pc_config = yaml.safe_load(open("sessions/pc_config.yaml", 'r'))
-    root_dir = root#pc_config[device_name]
 
-    print("[INF] Root directory: %s\n"% root_dir)
+    print("[INF] Root directory: %s\n"% root)
 
-    dir_path = os.path.join(root_dir,dataset,seq)
+    dir_path = os.path.join(root,dataset,seq,'extracted')
     assert os.path.exists(dir_path), "Data directory does not exist:" + dir_path
     
     print("[INF] Loading data from directory: %s\n" % dir_path)
 
     # Create Save Directory
-    save_root_dir  = os.path.join(root_dir,dataset,seq,"tempv2")
+    save_root_dir  = os.path.join(root,dataset,seq,"tempv2")
     if args.debug_mode:
         save_root_dir = os.path.join('temp',dataset,seq)
     
@@ -149,13 +146,13 @@ if __name__ == "__main__":
     print("[INF] Saving data to directory: %s\n" % save_root_dir)
 
     # Loading DATA
-    from dataloader.kitti.kitti_dataset import load_positions
+    from dataloader.horto3dlm.dataset import load_positions
    
     
     assert args.pose_data_source in ['gps','poses','positions'], "Invalid pose data source"
     
     
-    pose_file = os.path.join(dir_path,'tempv2',f'{args.pose_data_source}.txt')
+    pose_file = os.path.join(dir_path,f'{args.pose_data_source}.txt')
     
     
     poses = load_positions(pose_file)
@@ -167,7 +164,7 @@ if __name__ == "__main__":
     # Load Row Labels
     if args.load_labels:
         labels = []
-        row_label_file = os.path.join(root_dir,dataset,seq,'point_row_labels.pkl')
+        row_label_file = os.path.join(dir_path,'point_row_labels.pkl')
         assert os.path.isfile(row_label_file), "Row label file does not exist " + row_label_file
         with open(row_label_file, 'rb') as f:
             labels = pickle.load(f)
