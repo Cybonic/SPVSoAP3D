@@ -25,10 +25,10 @@ from trainer import Trainer
 from pipeline_factory import model_handler,dataloader_handler
 import numpy as np
 
+# To force deterministic algorithms
 # On terminal run the following command to set the environment variable
 # export CUBLAS_WORKSPACE_CONFIG=":4096:8"
-
-torch.use_deterministic_algorithms(True)
+# torch.use_deterministic_algorithms(True)
   
 def force_cudnn_initialization():
     s = 32
