@@ -67,7 +67,7 @@ if __name__ == '__main__':
         '--resume', '-r',
         type=str,
         required=False,
-        default='/home/tiago/workspace/SPCoV/checkpoints/iros24_published/sj23-spvsoap3d.pth',
+        default='None',
         help='Directory to get the trained model.'
     )
 
