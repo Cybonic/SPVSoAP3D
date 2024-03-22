@@ -48,7 +48,6 @@ class Trainer(BaseTrainer):
         self.train_metrics = None #StreamSegMetrics(len(labels))
         self.val_metrics   = None #StreamSegMetrics(len(labels))
         
-    
         self.monitor_range = monitor_range
         self.eval_approach = PlaceRecognition(self.model ,
                                                 self.val_loader,
@@ -86,8 +85,7 @@ class Trainer(BaseTrainer):
                     output.append(output_dict)
                 else:
                     output.append(item)
-
-                       
+                            
         elif isinstance(input,dict):
             output = {}
             for k,v in input.items():
@@ -101,10 +99,8 @@ class Trainer(BaseTrainer):
 # 
 # ===================================================================================================================
     def mean_grad(self,batch_size):
-
         for name, param in self.model.named_parameters():
             if param.requires_grad and  param.grad is not None:
-                
                 param.grad /= batch_size
     
     def _train_epoch(self, epoch, batch_size = 10):
@@ -114,9 +110,6 @@ class Trainer(BaseTrainer):
         
         row_labels = self.train_loader.dataset.row_labels
         
-        max_label = np.max(row_labels)
-        min_label = np.min(row_labels)
-        
         dataloader = iter(self.train_loader)
         n_samples  = len(self.train_loader)
         tbar = tqdm(range(len(self.train_loader)), ncols=80)
@@ -124,15 +117,12 @@ class Trainer(BaseTrainer):
         self._reset_metrics()
         epoch_loss_list = {}
         epoch_loss = 0
-        
         batch_norm = []
         
         self.optimizer.zero_grad()
         for batch_idx in tbar:
             
             input = next(dataloader)
-            #input_tonsor = self._send_to_device(input)
-                    
             batch_data ,info= self.model(input,labels = row_labels)
             
             for key,value in info.items():
@@ -145,7 +135,6 @@ class Trainer(BaseTrainer):
             epoch_loss += batch_data.detach().cpu().item()
 
             bar_str = 'T ({}) | Loss {:.10f}'.format(epoch,epoch_loss/(batch_idx+1))
-            
             
             tbar.set_description(bar_str)
             tbar.update()
@@ -164,7 +153,6 @@ class Trainer(BaseTrainer):
                 self.mean_grad(batch_size)
                 self.optimizer.step()
                 self.optimizer.zero_grad()
-                #torch.cuda.empty_cache()
                 
         self.logger.info(bar_str)
         # Update the model after the last batch

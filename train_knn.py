@@ -279,8 +279,6 @@ if __name__ == '__main__':
     print("MiniBatch Size: ", str(SESSION['trainer']['minibatch_size']))
     
     print("\n======= VAL LOADER =======")
-    #print("Dataset  : ", SESSION['val_loader']['dataset'])
-    #print("Sequence : ", SESSION['val_loader']['sequence'])
     print("Batch Size : ", str(SESSION['val_loader']['batch_size']))
     print("Max Points: " + str(SESSION['max_points']))
     print("Eval Data File: " + str(FLAGS.eval_file))
@@ -318,7 +316,6 @@ if __name__ == '__main__':
                             loss = SESSION['loss'],
                             trainer = SESSION['trainer']
                             )
-
     
     loader = dataloader_handler(FLAGS.dataset_root,
                                 FLAGS.network,
@@ -343,7 +340,7 @@ if __name__ == '__main__':
             run_name = run_name,
             train_epoch_zero = True,
             monitor_range = SESSION['monitor_range'],
-            window_roi    = FLAGS.eval_roi_window,
+            roi_window    = FLAGS.eval_roi_window,
             eval_protocol = 'place',
             debug = False
             )
