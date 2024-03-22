@@ -46,7 +46,6 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
     print(f"Model: {pipeline_name}")
     print(f"N.points: {num_points}")
     print(f"Dpts: {output_dim}")
-    print(f"Feat Dim: {feat_dim}")
     print("**************************************************\n")
 
     if pipeline_name == 'LOGG3D':
@@ -54,13 +53,13 @@ def model_handler(pipeline_name, num_points=4096,output_dim=256,feat_dim=1024,de
     elif pipeline_name == 'SPVSoAP3D':
         pipeline = SPVSoAP3D(output_dim=output_dim,
                            local_feat_dim=16,
-                           do_fc  = True,
-                           do_epn = False,
-                           do_log = True,
-                           do_pn  = True,
-                           do_pnl = True,
-                           pres   = 0.1,
-                           vres   = 0.1,
+                           do_fc  = True, # use fully connected layer
+                           do_epn = False, # use spectral power-norm
+                           do_log = True, # use log
+                           do_pn  = True, # use power-norm 
+                           do_pnl = True, # trainable pwer-norm param (during training)
+                           pres   = 0.1, # voxelization 
+                           vres   = 0.1, # voxelization
                            )
     elif pipeline_name == 'PointNetVLAD':
         pipeline = PointNetVLAD(use_tnet=True, output_dim=output_dim, num_points = num_points, feat_dim = 1024)
@@ -109,8 +108,6 @@ def dataloader_handler(root_dir,network,dataset,val_set,session,pcl_norm=False,*
     roi = None
     if 'roi' in args and args['roi'] > 0:
         roi = {}
-        #sensor_pram = sensor_pram[dataset]
-        #roi = sensor_pram['square_roi']
         print(f"\nROI: {args['roi']}\n")
         roi['xmin'] = -args['roi']
         roi['xmax'] = args['roi']
@@ -119,10 +116,7 @@ def dataloader_handler(root_dir,network,dataset,val_set,session,pcl_norm=False,*
 
     if network in ['overlap_transformer']:
         # These networks use proxy representation to encode the point clouds
-        
         if session['modality'] == "bev" or network == "overlap_transformer":
-            #sensor_pram = sensor_pram[dataset]
-            #bev_pram = sensor_pram['BEV']
             modality = BEVProjection(width=256,height=256,square_roi=roi)
         elif session['modality'] == "spherical" or network != "overlap_transformer":
             modality = SphericalProjection(256,256,square_roi=roi)
@@ -133,14 +127,11 @@ def dataloader_handler(root_dir,network,dataset,val_set,session,pcl_norm=False,*
         modality = SparseLaserScan(voxel_size=0.1,max_points=num_points, pcl_norm = False)
     
     elif network in ['PointNetVLAD']:
-        
         # Get point cloud based modality
         num_points = session['max_points']
         modality = Scan(max_points=num_points,square_roi=roi, pcl_norm=pcl_norm,clean_zeros=False)
     else:
         raise NotImplementedError("Modality not implemented!")
-
-    #dataset = dataset.lower()
 
     # Select experiment type by default is cross_validation
     model_evaluation = "cross_validation" # Default

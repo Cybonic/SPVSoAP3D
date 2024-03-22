@@ -59,7 +59,7 @@ if __name__ == '__main__':
         '--experiment', '-e',
         type=str,
         required=False,
-        default='test',
+        default='iros24',
         help='Directory to get the trained model.'
     )
 
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
-        '--epoch',
+        '--epochs',
         type=int,
         required=False,
         default=5,
@@ -91,7 +91,7 @@ if __name__ == '__main__':
         '--dataset',
         type=str,
         required=False,
-        default='HORT-3DLM', # uk
+        default='HORTO', # uk
         help='Directory to get the trained model.'
     )
     parser.add_argument(
@@ -202,7 +202,7 @@ if __name__ == '__main__':
         type=str,
         required=False,
         default = "cross_validation",
-        choices = ["cross_validation","split"]
+        choices = ["cross_validation"]
     )
     parser.add_argument(
         '--session',
@@ -256,15 +256,16 @@ if __name__ == '__main__':
     SESSION['model_evaluation'] = FLAGS.model_evaluation
     
    
-    SESSION['val_loader']['batch_size'] = FLAGS.eval_batch_size
     SESSION['train_loader']['triplet_file'] = FLAGS.triplet_file
     SESSION['train_loader']['augmentation'] = FLAGS.augmentation
     SESSION['train_loader']['shuffle_points'] = FLAGS.shuffle_points
+    
+    SESSION['val_loader']['batch_size'] = FLAGS.eval_batch_size
     SESSION['val_loader']['ground_truth_file'] = FLAGS.eval_file
     SESSION['val_loader']['augmentation'] = False
     
     
-    SESSION['trainer']['epochs'] =  FLAGS.epoch
+    SESSION['trainer']['epochs'] =  FLAGS.epochs
     SESSION['loss']['type'] = FLAGS.loss
     SESSION['max_points']= FLAGS.max_points
     SESSION['memory']= FLAGS.memory
@@ -306,7 +307,7 @@ if __name__ == '__main__':
     print(f'Device: {FLAGS.device}')
     print("Loss: %s" %(SESSION['loss']['type']))
     print("Experiment: %s" %(FLAGS.experiment))
-    print("Max epochs: %s" %(FLAGS.epoch))
+    print("Max epochs: %s" %(FLAGS.epochs))
     print("PCL Norm: %s" %(FLAGS.pcl_norm))
     #print("Modality: %s" %(model_param['modality']))
     print("----------\n")

@@ -1,45 +1,35 @@
 
 import os
-import subprocess
-
-full_cap = '--epoch 20'
-args = [
-        '--network SPVSoAP3D',
-]       
-
-losses = ['LazyTripletLoss']
-
-density = ['10000']
-
-evaluation_type = "cross_validation"
-experiment      = f'-e iros24/{evaluation_type}'
-input_preprocessing = ' --roi 0 --augmentation 1 --shuffle_points 1 --pcl_norm 0'
 
 
-chk_dir = '~/workspace/SPCoV/checkpoints/iros24_published/sj23-spvsoap3d.pth'
+# Define the number of epochs
+epochs = 20
+# Define the path to the checkpoints
+# Define the path to the dataset
+# dataset_root = '/home/tiago/workspace/DATASET'
+dataset_root = '/home/tiago/workspace/DATASET'
 
-test_sequrnces = [
-        #'--val_set GEORGIA-FR/husky/orchards/10nov23/00/submaps',
-        f'--val_set uk/strawberry/june23/extracted --resume {chk_dir}/sj23-spvsoap3d.pth',
-        #'--val_set greenhouse/e3/extracted', 
-        #'--val_set uk/orchards/aut22/extracted',
-        #'--val_set uk/orchards/sum22/extracted',
-        #'--val_set uk/orchards/june23/extracted'
-]
+# Path to save the predictions
+save_path  = 'predictions/iros24'
 
-for seq in test_sequrnces:
-        for arg in args:
-                func_arg = [arg,
-                            f'--model_evaluation {evaluation_type}',
-                            '--memory DISK',
-                            '--device cpu',
-                            seq,
-                            experiment,
-                            full_cap,
-                            #resume,
-                            input_preprocessing
-                ]
+# Define the number of points
+density = '10000'
+
+input_preprocessing = ' --roi 0 --augmentation 1 --shuffle_points 1'
+
+test_sequences = ['GTJ23']#,'OJ22','OJ23','ON22','ON23','SJ23']
+
+for seq in test_sequences:
+        func_arg = [
+                f'--dataset_root {dataset_root}', # path to Dataset 
+                f'--val_set {seq}',
+                '--memory DISK', # [DISK, RAM] 
+                '--device cuda', # Device
+                f'--save_predictions {save_path}', # Save predictions
+                f'--epochs {epochs}',
+                input_preprocessing
+        ]
                 
-                func_arg_str = ' '.join(func_arg)        
-                
-                os.system('python3 train_knn.py ' + func_arg_str)
+        func_arg_str = ' '.join(func_arg)        
+        
+        os.system('python3 train_knn.py ' + func_arg_str)

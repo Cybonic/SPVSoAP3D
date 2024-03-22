@@ -102,7 +102,7 @@ class Triplet():
         
         # Load dataset and laser settings
         self.anchors = np.array(self.anchors)
-        self.poses = np.array(self.poses)
+        self.poses   = np.array(self.poses)
         self.row_labels = np.array(self.row_labels)
 
         self.num_anchors = len(self.anchors)
@@ -110,9 +110,16 @@ class Triplet():
 
         n_points = self.poses.shape[0]
         self.table = np.zeros((n_points,n_points))
+        print(n_points)
+        
         for a,pos in zip(self.anchors,self.positives):
             for p in pos:
-                self.table[a,p]=1
+                
+                try:    
+                    self.table[a,p]=1
+                except:
+                    print(a,p)
+                    raise Exception("Error")
     
         # Load Data to RAM
         if self.memory == 'RAM':

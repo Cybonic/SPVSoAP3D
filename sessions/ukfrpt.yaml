@@ -16,7 +16,6 @@ aug: False # Augment data with rotations
 
 base_dir: "uk"
 memory: "DISK"
-modality: "bev"
 
 
 # Dataset parameters
@@ -38,7 +37,7 @@ train_loader:
   
 val_loader:
   ground_truth_file: "eval/ground_truth_loop_range_10m.pkl"
-  batch_size: 1 #50         # batch size
+  batch_size: 1 #50      # batch size
   workers:  0            # number of threads to get data
   shuffle: False
   loop_range: 10 # Loop Threshold [m]
