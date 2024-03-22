@@ -130,12 +130,6 @@ Training Triplets
   </tr>
 </table>
 
-<table>
-  <tr>
-<td align="center"> <img src="figs/sequence.png"  style="width: 300;"td>
-  </tr>
-</table>
-
 
 ### Script to train all sequences
 
