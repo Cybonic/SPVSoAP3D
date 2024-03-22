@@ -84,11 +84,6 @@ For more details on the xxx.csv files, please read READ-ME.md file in the 24SPVS
 
 ## Testing
 
-<table>
-  <tr>
-<td align="center"> <img src="figs/sequence.png"  td>
-  </tr>
-</table>
 
 ### Run eval on all sequnces
 
@@ -126,14 +121,22 @@ python eval_knn.py
 Training Triplets
 <table>
   <tr>
-    <td  align="center"> <img src="figs/on23_triplet.gif" alt="GIF 1" style="width: 350px;"/> </td>
-    <td align="center"> <img src="figs/gtj23_triplet.gif" alt="GIF 2" style="width: 350px;"/> </td>
+    <td  align="center"> <img src="figs/on23_triplet.gif" alt="GIF 1" style="width: 450px;"/> </td>
+    <td align="center"> <img src="figs/gtj23_triplet.gif" alt="GIF 2" style="width: 450px;"/> </td>
   </tr>
   <tr>
     <td align="center"> ON23 </td>
     <td align="center"> GTJ23 </td>
   </tr>
 </table>
+
+<table>
+  <tr>
+<td align="center"> <img src="figs/sequence.png"  style="width: 300;"td>
+  </tr>
+</table>
+
+
 ### Script to train all sequences
 
 **1.** First edit ***script_train.py***  to set the path to the dataset and other parameters   
