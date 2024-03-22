@@ -178,7 +178,6 @@ if __name__ == '__main__':
     SESSION['experiment'] = FLAGS.experiment
     
     # Define evaluation mode: cross_validation or split
-    SESSION['model_evaluation'] = FLAGS.model_evaluation
     SESSION['train_loader']['triplet_file'] = None
     
     # Update the validation loader
@@ -258,7 +257,8 @@ if __name__ == '__main__':
             run_name     = run_name,
             train_epoch_zero = False,
             monitor_range = FLAGS.monitor_loop_range,
-            window_roi    = FLAGS.eval_roi_window,
+            roi_window    = FLAGS.eval_roi_window,
+            warmup_window = FLAGS.eval_warmup_window,
             eval_protocol = 'place',
             debug = False
             )

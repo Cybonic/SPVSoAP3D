@@ -32,8 +32,8 @@ class PlaceRecognition():
                     top_cand,
                     eval_metric,
                     logger,
-                    window        = 600,
-                    warmup        = 600,
+                    roi_window    = 600,
+                    warmup_window = 100,
                     save_deptrs   = True,
                     device        = 'cpu',
                     eval_protocol = 'place',
@@ -52,9 +52,9 @@ class PlaceRecognition():
         self.model  = model#.to(self.device)
         self.loader = loader
         self.top_cand = top_cand
-        self.window   = window
-        self.warmup   = warmup
-  
+        self.roi_window    = roi_window
+        self.warmup_window = warmup_window
+        
         self.model_name      = str(self.model).lower()
         self.save_deptrs     = save_deptrs # Save descriptors after being generated 
         self.use_load_deptrs = False # Load descriptors when they are already generated 
@@ -62,7 +62,7 @@ class PlaceRecognition():
 
         self.dataset_name = str(loader.dataset)
         self.anchors  = loader.dataset.get_anchor_idx()
-        table = loader.dataset.table
+        table      = loader.dataset.table
         self.poses = loader.dataset.get_pose()
         self.row_labels = loader.dataset.get_row_labels()
 
@@ -77,7 +77,8 @@ class PlaceRecognition():
         
         self.param = {}
         self.param['top_cand']     = top_cand
-        self.param['window']       = warmup
+        self.param['roi_window']   = self.roi_window
+        self.param['warmup_window'] = self.warmup_window
         self.param['eval_metric']  = eval_metric
         self.param['save_deptrs']  = save_deptrs
         self.param['device']       = device
@@ -403,8 +404,8 @@ class PlaceRecognition():
                                                     self.row_labels, # Row labels
                                                     k_top_cand, # Max top candidates
                                                     radius=self.loop_range_distance, # Radius
-                                                    window=self.window,
-                                                    warmup=self.warmup,
+                                                    roi_window=self.roi_window,
+                                                    warmup_window=self.warmup_window,
                                                     sim = sim_func 
                                                     )
         
@@ -415,7 +416,7 @@ class PlaceRecognition():
                                                     self.row_labels, # Row labels
                                                     k_top_cand, # Max top candidates
                                                     radius=self.loop_range_distance, # Radius
-                                                    window=self.window,
+                                                    window=self.roi_window,
                                                     sim = sim_func # 
                                                     )
         else:
