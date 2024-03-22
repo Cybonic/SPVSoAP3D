@@ -133,7 +133,7 @@ if __name__ == '__main__':
         type=str,
         required=False,
         default = 'LazyTripletLoss',
-        choices=['LazyTripletLoss','LazyQuadrupletLoss','PositiveLoss'],
+        choices=['LazyTripletLoss'],
         help='Directory to get the trained model.'
     )
     parser.add_argument(
@@ -148,14 +148,7 @@ if __name__ == '__main__':
         type=int,
         required=False,
         default = 1024,
-        help='sampling points.'
-    )
-    parser.add_argument(
-        '--modality',
-        type=str,
-        required=False,
-        default = "pcd",
-        help='sampling points.'
+        help='number of features.'
     )
 
     parser.add_argument(
