@@ -23,7 +23,8 @@ class Trainer(BaseTrainer):
                         debug = False,
                         monitor_range = 1, # The range to monitor the performance (meters)
                         eval_protocol='place',
-                        window_roi = 600
+                        roi_window = 600,
+                        warmup_window = 100,
                         
                         ):
 
@@ -39,8 +40,6 @@ class Trainer(BaseTrainer):
         self.hyper_log      = config
         self.loss_dist      = config['loss']['args']['metric']
         
-        logger = self.logger
-        
         self.eval_metric = config['trainer']['eval_metric']
         self.top_cand_retrieval = config['retrieval']['top_cand']
         
@@ -49,15 +48,15 @@ class Trainer(BaseTrainer):
         self.train_metrics = None #StreamSegMetrics(len(labels))
         self.val_metrics   = None #StreamSegMetrics(len(labels))
         
-        
-        window = window_roi # Avoid the nearby frames
+    
         self.monitor_range = monitor_range
         self.eval_approach = PlaceRecognition(self.model ,
                                                 self.val_loader,
                                                 self.top_cand_retrieval,
                                                 self.loss_dist,
                                                 self.logger,
-                                                window = window,
+                                                roi_window = roi_window,
+                                                warmup_window = warmup_window,
                                                 device = self.device,
                                                 eval_protocol = eval_protocol,
                                                 logdir =  run_name['experiment'],
