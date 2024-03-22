@@ -38,79 +38,42 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser("./infer.py")
 
     parser.add_argument(
-        '--dataset_root',
-        type=str,
-        required=False,
-        default='/home/tiago/DATASETS_TO_NAS',
-        help='Directory to get the trained model.'
+        '--dataset_root',type=str, required=True,
+        help='Directory to the dataset root'
     )
     
     parser.add_argument(
-        '--network', '-m',
-        type=str,
-        required=False,
-        default='SPVSoAP3D',
-        help='Directory to get the trained model.'
+        '--network', type=str,
+        default='SPVSoAP3D', help='model to be used'
     )
 
     parser.add_argument(
-        '--experiment', '-e',
-        type=str,
-        required=False,
-        default=f'iros24',
-        help='Directory to get the trained model.'
+        '--experiment',type=str,
+        default='iros24',
+        help='Name of the experiment to be executed'
     )
 
     parser.add_argument(
-        '--memory',
-        type=str,
-        required=False,
+        '--memory', type=str,
         default='DISK',
         choices=['DISK','RAM'],
-        help='Directory to get the trained model.'
+        help='RAM: loads the dataset to the RAM memory first. DISK: loads the dataset on the fly from the disk'
     )
 
     parser.add_argument(
-        '--device',
-        type=str,
-        required=False,
+        '--device', type=str,
         default='cuda',
         help='Directory to get the trained model.'
     )
     parser.add_argument(
-        '--batch_size',
-        type=int,
-        required=False,
+        '--batch_size',type=int,
         default=10,
-        help='Directory to get the trained model.'
+        help='Batch size'
     )
+    
     parser.add_argument(
-        '--max_points',
-        type=int,
-        required=False,
+        '--max_points',type=int,
         default = 10000,
-        help='sampling points.'
-    )
-    parser.add_argument(
-        '--feat_dim',
-        type=int,
-        required=False,
-        default = 1024,
-        help='sampling points.'
-    )
-    parser.add_argument(
-        '--modality',
-        type=str,
-        required=False,
-        default = "pcl",
-        help='sampling points.'
-    )
-
-    parser.add_argument(
-        '--triplet_file',
-        type=str,
-        required=False,
-        default = "triplet/ground_truth_ar0.5m_nr10m_pr2m.pkl",
         help='sampling points.'
     )
 
@@ -127,7 +90,7 @@ if __name__ == '__main__':
         type=float,
         required=False,
         default = 10,
-        help='sampling points.'
+        help='loop range to monitor the performance.'
     )
 
     parser.add_argument(
@@ -143,6 +106,7 @@ if __name__ == '__main__':
         type=str,
         required=False,
         default = 'GTJ23',
+        help = 'Validation set'
     )
 
     parser.add_argument(
@@ -150,19 +114,7 @@ if __name__ == '__main__':
         type=float,
         required=False,
         default = 0,
-    )
-    parser.add_argument(
-        '--model_evaluation',
-        type=str,
-        required=False,
-        default = "cross_validation",
-        choices = ["cross_validation"]
-    )
-    parser.add_argument(
-        '--chkpt_root',
-        type=str,
-        required=False,
-        default = "None"
+        help = 'Crop range [m] to crop the point cloud around the scan origin.'
     )
     
     parser.add_argument(
@@ -170,7 +122,7 @@ if __name__ == '__main__':
         type=str,
         required=False,
         default='/home/tiago/workspace/SPCoV/predictions',
-        help='Directory to get the trained model.'
+        help='Directory to get the trained model or descriptors.'
     )
 
     parser.add_argument(
@@ -185,6 +137,7 @@ if __name__ == '__main__':
         type=float,
         required=False,
         default = 100,
+        help='Number of frames to ignore in imidaite vicinity of the query frame.'
     )
     
     parser.add_argument(
@@ -192,13 +145,14 @@ if __name__ == '__main__':
         type=float,
         required=False,
         default = 100,
+        help='Number of frames to ignore in the beginning of the sequence'
     )
     
     parser.add_argument(
         '--eval_protocol',
         type=str,
         required=False,
-        choices=['place','relocalization'],
+        choices=['place'],
         default = 'place',
     )
     
@@ -220,33 +174,33 @@ if __name__ == '__main__':
     SESSION = yaml.safe_load(open(session_cfg_file, 'r'))
 
     SESSION['save_predictions'] = FLAGS.save_predictions
-    
-    if FLAGS.chkpt_root != "None":
-        SESSION['trainer']['save_dir'] =  FLAGS.chkpt_root
     # Update config file with new settings
     SESSION['experiment'] = FLAGS.experiment
-    SESSION['trainer']['feat_dim']  = FLAGS.feat_dim
     
     # Define evaluation mode: cross_validation or split
     SESSION['model_evaluation'] = FLAGS.model_evaluation
+    SESSION['train_loader']['triplet_file'] = None
     
+    # Update the validation loader
     SESSION['val_loader']['batch_size'] = FLAGS.batch_size
-    SESSION['train_loader']['triplet_file'] = FLAGS.triplet_file
     SESSION['val_loader']['ground_truth_file'] = FLAGS.eval_file
     SESSION['val_loader']['augmentation'] = False
     
-    SESSION['val_loader']['roi'] = FLAGS.roi
+    # Update the model settings
+    SESSION['roi'] = FLAGS.roi
     SESSION['max_points'] = FLAGS.max_points
     SESSION['memory']     = FLAGS.memory
-    SESSION['monitor_range'] = FLAGS.monitor_loop_range
+    SESSION['monitor_range']   = FLAGS.monitor_loop_range
     SESSION['eval_roi_window'] = FLAGS.eval_roi_window
-    
+    SESSION['descriptor_size'] = 256
+    SESSION['eval_warmup_window'] = FLAGS.eval_warmup_window
+    SESSION['eval_protocol'] = FLAGS.eval_protocol
+    SESSION['device'] = FLAGS.device
 
 
     print("----------")
     print("Saving Predictions: %s"%FLAGS.save_predictions)
     print("\n======= VAL LOADER =======")
-    # print("Sequence : ", SESSION['val_loader']['sequence'])
     print("Batch Size : ", str(SESSION['val_loader']['batch_size']))
     print("Max Points: " + str(SESSION['max_points']))
     print("\n========== MODEL =========")
@@ -272,9 +226,8 @@ if __name__ == '__main__':
     model = model_handler(FLAGS.network,
                             num_points = SESSION['max_points'],
                             output_dim = 256,
-                            feat_dim   = FLAGS.feat_dim,
                             device     = FLAGS.device,
-                            trainer = SESSION['trainer']
+                            trainer    = SESSION['trainer']
                             )
 
     print("*"*30)
@@ -291,13 +244,13 @@ if __name__ == '__main__':
                                 pcl_norm = False)
 
     run_name = {'dataset': '-'.join(str(FLAGS.val_set).split('/')),
-                'experiment':os.path.join(FLAGS.experiment,FLAGS.triplet_file,str(FLAGS.max_points)), 
+                'experiment':os.path.join(FLAGS.experiment,str(FLAGS.max_points)), 
                 'model': str(model)
             }
 
     trainer = Trainer(
             model        = model,
-            train_loader = None,#loader.get_train_loader(),
+            train_loader = None, #loader.get_train_loader(),
             val_loader   = loader.get_val_loader(),
             resume       = None,
             config       = SESSION,
@@ -310,16 +263,20 @@ if __name__ == '__main__':
             debug = False
             )
     
+    # Define a set of loop ranges to be evaluated
     loop_range = list(range(0,120,1))
     
+    # Check if the resume file exists
     assert os.path.exists(FLAGS.resume ), "File not found %s"%FLAGS.resume 
-        
+    
+    # Check if to resume from a checkpoint or a descriptor file
     if FLAGS.resume.split('/')[-1] == 'checkpoints.pth':
         trainer.eval_approach.load_pretrained_model(FLAGS.resume)
         
     if FLAGS.resume.split('/')[-1] == 'descriptors.torch':
         trainer.eval_approach.load_descriptors(FLAGS.resume)
     
+    # Run the evaluation
     trainer.eval_approach.run(loop_range=loop_range)
     
     save_to = FLAGS.save_predictions
