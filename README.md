@@ -1,5 +1,17 @@
 
+<table>
+  <tr>
+    <td align="center"> <img src="figs/3dmap.png"  td>
+  </tr>
+</table>
 
+Pipeline
+
+<table>
+  <tr>
+<td align="center"> <img src="figs/pipeline.png"  td>
+  </tr>
+</table>
 ## INSTALLATION
 
 #### Set up environment
@@ -30,17 +42,17 @@ conda install pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 pytorch-cuda=
 pip install --upgrade git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0
 ```
 
-### Install remaining libs
+#### Install remaining libs
 ```
 pip install -r requirements.txt
 ```
-
 
 
 ## Download 
 
 ### Dataset
 
+Download the dataset from https://github.com/Cybonic/HORTO-3DLM
 
 
 ### Checkpoints 
@@ -68,6 +80,9 @@ SPVSoAP3D_iros24.zip contains additionally the descriptors and results obtained 
 ```
 For more details on the xxx.csv files, please read READ-ME.md file in the 24SPVSoAP3D_iros24.zip.
 
+## Testing
+
+
 ### Run eval on all sequnces
 
 **1**. Edite the *script_eval.py* file, adding the chackpoint and dataset paths
@@ -84,9 +99,8 @@ resume  = "checkpoints.pth" # <-- choise [checkpoints.pth, descriptors.torch]
 
 **2**. Run the file
 ```
-python script_eval.py  # runs all sequences 
+python script_eval.py
 ```
-
 
 ### Run eval on a single sequence 
 
@@ -100,7 +114,27 @@ python eval_knn.py
 ```
 **Note:** We have noticed that performance changes when using GPU with different cuda versions.  
 
+## Training
+
+Training Triplets
+<table>
+  <tr>
+    <td  align="center"> <img src="figs/on23_triplet.gif" alt="GIF 1" style="width: 250px;"/> </td>
+    <td align="center"> <img src="figs/gtj23_triplet.gif" alt="GIF 2" style="width: 250px;"/> </td>
+  </tr>
+  <tr>
+    <td align="center"> ON23 </td>
+    <td align="center"> GTJ23 </td>
+  </tr>
+</table>
 ### Script to train all sequences
+
+**1.** First edit ***script_train.py***  to set the path to the dataset and other parameters   
+
+**2.** Then, run script
+```
+python script_train.py 
+```
 
 
 ### Train on a single sequence

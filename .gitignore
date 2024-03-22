@@ -9,7 +9,6 @@ temp/
 predictions/
 results/
 logs/
-*.gif
 data/*
 *.torch
 *.csv
