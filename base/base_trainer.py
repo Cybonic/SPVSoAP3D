@@ -1,8 +1,6 @@
-import os, json, math, logging, sys, datetime
-import numpy
+import os, json, math, logging, datetime
 import torch
 from torch.utils import tensorboard
-from utils import helpers
 from utils import logger
 #import utils.lr_scheduler
 import torch.optim.lr_scheduler as lr_scheduler
@@ -106,7 +104,7 @@ class BaseTrainer:
 
         self.save_best_model_filename = os.path.join(self.checkpoint_dir, f'best_model.pth')
 
-        helpers.dir_exists(self.checkpoint_dir)
+        os.makedirs(self.checkpoint_dir, exist_ok=True)
         config_save_path = os.path.join(self.checkpoint_dir, 'config.json')
         with open(config_save_path, 'w') as handle:
             json.dump(self.config, handle, indent=4, sort_keys=True)
