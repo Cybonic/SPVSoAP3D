@@ -126,8 +126,8 @@ python eval_knn.py
 Training Triplets
 <table>
   <tr>
-    <td  align="center"> <img src="figs/on23_triplet.gif" alt="GIF 1" style="width: 250px;"/> </td>
-    <td align="center"> <img src="figs/gtj23_triplet.gif" alt="GIF 2" style="width: 250px;"/> </td>
+    <td  align="center"> <img src="figs/on23_triplet.gif" alt="GIF 1" style="width: 350px;"/> </td>
+    <td align="center"> <img src="figs/gtj23_triplet.gif" alt="GIF 2" style="width: 350px;"/> </td>
   </tr>
   <tr>
     <td align="center"> ON23 </td>
