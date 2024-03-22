@@ -1,17 +1,19 @@
 
 <table>
   <tr>
-    <td align="center"> <img src="figs/3dmap.png"  td>
+    <td align="center"> <img src="figs/3dmap.png"  style="width: 750px;"td>
+    <td align="center"> <img src="figs/robots.png"   style="width: 270px;"td>
   </tr>
 </table>
 
-Pipeline
 
+### Pipeline
 <table>
   <tr>
 <td align="center"> <img src="figs/pipeline.png"  td>
   </tr>
 </table>
+
 ## INSTALLATION
 
 #### Set up environment
@@ -82,6 +84,11 @@ For more details on the xxx.csv files, please read READ-ME.md file in the 24SPVS
 
 ## Testing
 
+<table>
+  <tr>
+<td align="center"> <img src="figs/sequence.png"  td>
+  </tr>
+</table>
 
 ### Run eval on all sequnces
 
