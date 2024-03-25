@@ -30,7 +30,7 @@ conda create -n pr_env python=3.9.4
 ```
 conda activate pr_env
 ```
-#### Install Conda 11.7.0
+#### Install cuda 11.7.0
 ```
 conda install -c "nvidia/label/cuda-11.7.0" cuda-toolkit
 ```
@@ -39,7 +39,9 @@ conda install -c "nvidia/label/cuda-11.7.0" cuda-toolkit
 ```
 conda install pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 pytorch-cuda=11.7 -c pytorch -c nvidia
 ```
-#### Install Sparse
+#### Install Troch Sparse
+
+Note: Tested on Ubuntu 20.04 and 22.04
 ```
 pip install --upgrade git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0
 ```
@@ -56,6 +58,7 @@ pip install -r requirements.txt
 
 Download the dataset from https://github.com/Cybonic/HORTO-3DLM
 
+[direct link](https://nas-greenbotics.isr.uc.pt/drive/d/f/xlBvECKhyOdCECr8ybsjCbo5VSv8Y2Qe)
 
 ### Checkpoints 
 The checkpoints can be downloaded from  [SPVSoAP3D_iros24.zip](https://nas-greenbotics.isr.uc.pt/drive/d/s/xkN8AYuu7uiP9n4kp2Am1fUNFxE2dLaa/bRgEMDjkuiBPCYZb9qKxFg7_3cZ50SXd-DLkgwc17OQs).
@@ -84,10 +87,9 @@ For more details on the xxx.csv files, please read READ-ME.md file in the 24SPVS
 
 ## Testing
 
-
 ### Run eval on all sequnces
 
-**1**. Edite the *script_eval.py* file, adding the chackpoint and dataset paths
+**1**. Edit the *script_eval.py* file, adding the chackpoint and dataset paths
 
 script_eval.py:
 ```
@@ -119,6 +121,9 @@ python eval_knn.py
 ## Training
 
 Training Triplets
+- Anchor (Green)
+- Positive (Blue)
+- Negatives (Red)
 <table>
   <tr>
     <td  align="center"> <img src="figs/on23_triplet.gif" alt="GIF 1" style="width: 450px;"/> </td>
@@ -141,7 +146,7 @@ python script_train.py
 ```
 
 
-### Train on a single sequence
+### Train a single sequence
 ```
 python train_knn.py 
     --val_set <seq>
