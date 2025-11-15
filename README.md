@@ -43,7 +43,7 @@ conda install pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 pytorch-cuda=
 
 Note: Tested on Ubuntu 20.04 and 22.04
 ```
-pip install --upgrade git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0
+pip install --no-build-isolation --upgrade git+https://github.com/mit-han-lab/torchsparse.git@v1.4.0
 ```
 
 #### Install remaining libs
@@ -62,6 +62,10 @@ Download the dataset from https://github.com/Cybonic/HORTO-3DLM
 
 ### Checkpoints 
 The checkpoints can be downloaded from  [SPVSoAP3D_iros24.zip](https://nas-greenbotics.isr.uc.pt/drive/d/s/xkN8AYuu7uiP9n4kp2Am1fUNFxE2dLaa/bRgEMDjkuiBPCYZb9qKxFg7_3cZ50SXd-DLkgwc17OQs).
+
+"""
+
+
 
 SPVSoAP3D_iros24.zip contains additionally the descriptors and results obtained with SPVSoAP3D on all sequences. SPVSoAP3D_iros24.zip has the following strucutre:
 ```
