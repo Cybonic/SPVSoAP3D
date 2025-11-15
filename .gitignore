@@ -16,7 +16,6 @@ data/*
 *.bin
 Worklog.md
 *.ipynb
-*.sh
 *.txt
 *.pcd
 *.pkl
