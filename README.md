@@ -1,4 +1,3 @@
-
 <table>
   <tr>
     <td align="center"> <img src="figs/3dmap.png"  style="width: 750px;"td>
@@ -58,18 +57,20 @@ pip install -r requirements.txt
 
 Download the dataset from https://github.com/Cybonic/HORTO-3DLM
 
-[direct link](https://nas-greenbotics.isr.uc.pt/drive/d/f/xlBvECKhyOdCECr8ybsjCbo5VSv8Y2Qe)
-
 ### Checkpoints 
-The checkpoints can be downloaded from  [SPVSoAP3D_iros24.zip](https://nas-greenbotics.isr.uc.pt/drive/d/s/xkN8AYuu7uiP9n4kp2Am1fUNFxE2dLaa/bRgEMDjkuiBPCYZb9qKxFg7_3cZ50SXd-DLkgwc17OQs).
+To download the checkpoints, we recommend using the following script.
 
-"""
-
-
-
-SPVSoAP3D_iros24.zip contains additionally the descriptors and results obtained with SPVSoAP3D on all sequences. SPVSoAP3D_iros24.zip has the following strucutre:
+```bash
+sh script/download_weights.sh
 ```
-24SPVSoAP3D_iros24.zip
+
+This will download and unzip the checkpoints into a `checkpoints` directory.
+
+---
+
+`SPVSoAP3D_iros24.zip` contains additionally the descriptors and results obtained with SPVSoAP3D on all sequences. It has the following structure:
+```
+checkpoints/
 ├── READ-ME.md # file explaining the meaning of each file 
 ├── GT23 
 ├── OJ22
@@ -87,7 +88,7 @@ SPVSoAP3D_iros24.zip contains additionally the descriptors and results obtained 
         └── target.csv # ground-truth loops
 
 ```
-For more details on the xxx.csv files, please read READ-ME.md file in the 24SPVSoAP3D_iros24.zip.
+For more details on the xxx.csv files, please read READ-ME.md file in the `checkpoints` directory.
 
 ## Testing
 
@@ -117,7 +118,7 @@ resume choice: [checkpoints.pth or descriptors.torch]
 ```
 python eval_knn.py 
     --val_set <seq>
-    --resume <path/to/24SPVSoAP3D_iros24>/<seq>/<resume> 
+    --resume <path/to/checkpoints>/<seq>/<resume> 
     --save_predictions  <path/to/save/predictions>
 ```
 **Note:** We have noticed that performance changes when using GPU with different cuda versions.  
